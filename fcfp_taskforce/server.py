@@ -32,6 +32,8 @@ the old download-a-copy mode.
 import os
 import re
 import datetime
+import threading
+import webbrowser
 from copy import copy
 
 from flask import Flask, request, jsonify, send_from_directory
@@ -460,4 +462,13 @@ if __name__ == "__main__":
     print("=" * 64)
     if not os.path.exists(TRACKER_PATH):
         print(" WARNING: tracker file not found yet — set TRACKER_PATH.")
+    
+    # Auto-open localhost URL in default browser 1.2s after server starts
+    def open_browser():
+        try:
+            webbrowser.open(f"http://{HOST}:{PORT}")
+        except Exception:
+            pass
+
+    threading.Timer(1.2, open_browser).start()
     app.run(host=HOST, port=PORT, debug=False)
