@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic TM Investigator — Workflow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F141A;--ink-2:#2A333E;--muted:#5E6976;--faint:#939DA8;
+    --paper:#EAEDF0;--panel:#FFFFFF;--line:#D6DCE2;--line-2:#E8ECEF;
+    --teal:#0B6E75;--teal-deep:#08525A;--teal-wash:#E2EFEF;
+    --amber:#A9690C;--amber-wash:#F8EFDD;
+    --violet:#5A4A9C;--violet-wash:#EEEBF8;
+    --safe:#2C7A54;--safe-wash:#E3F1E9;
+    --rust:#B23A2E;
+    --navy:#16233B;--cyan:#3FB6C0;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+    --sans:'IBM Plex Sans',system-ui,sans-serif;--disp:'Space Grotesk',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--teal);color:#fff}
+
+  .top{background:var(--navy);color:#fff;padding:15px 26px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:30}
+  .top .g{width:30px;height:30px;border:1.5px solid #3C5170;border-radius:8px;display:grid;place-items:center;background:#0E1A2E;flex:0 0 auto}
+  .top .g i{width:7px;height:7px;background:var(--cyan);border-radius:50%;display:block}
+  .top h1{font-family:var(--disp);font-weight:700;font-size:16px;margin:0}
+  .top small{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8FA6BE;display:block;margin-top:1px}
+  .tools{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .walk{appearance:none;cursor:pointer;font-family:var(--mono);font-size:11px;background:#22355A;border:1px solid #3C5170;color:#CFE0EC;border-radius:8px;padding:7px 13px;display:inline-flex;align-items:center;gap:7px}
+  .walk:hover{background:#2A4068;color:#fff}
+  .walk:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .tip{font-family:var(--mono);font-size:10.5px;color:#8FA6BE}
+  .tip b{color:var(--cyan);font-weight:500}
+  @media(max-width:760px){.tip{display:none}}
+
+  .wrap{max-width:1010px;margin:0 auto;padding:26px 26px 80px;transition:padding-right .28s ease}
+  @media(min-width:1240px){body.open .wrap{padding-right:420px}}
+
+  .flow{position:relative}
+  .flow::before{content:"";position:absolute;left:23px;top:18px;bottom:40px;width:2px;background:var(--line)}
+  @media(max-width:640px){.flow::before{left:17px}}
+
+  .phase{position:relative;display:grid;grid-template-columns:48px 1fr;gap:16px;padding:0 0 12px}
+  @media(max-width:640px){.phase{grid-template-columns:36px 1fr;gap:11px}}
+  .marker{position:relative;z-index:2;padding-top:14px}
+  .marker .n{width:48px;height:48px;border-radius:14px;background:var(--panel);border:2px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:13px;color:var(--muted);transition:all .25s}
+  @media(max-width:640px){.marker .n{width:36px;height:36px;border-radius:11px;font-size:11px}}
+  .phase.lit .marker .n{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 0 0 5px var(--teal-wash)}
+  .phase.past .marker .n{background:var(--teal-wash);border-color:var(--teal);color:var(--teal-deep)}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:box-shadow .2s,border-color .2s}
+  .phase.lit .card{border-color:var(--teal);box-shadow:0 10px 30px -18px rgba(11,110,117,.5)}
+  .card .hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:14px 17px 0}
+  .card .ttl{font-family:var(--disp);font-weight:600;font-size:16.5px;letter-spacing:-.01em}
+  .card .who{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:5px}
+  .who.eng{color:var(--teal-deep);background:var(--teal-wash)}
+  .who.ai{color:var(--amber);background:var(--amber-wash)}
+  .who.chk{color:var(--violet);background:var(--violet-wash)}
+  .who.hum{color:var(--safe);background:var(--safe-wash)}
+
+  .split{display:grid;grid-template-columns:250px 1fr;gap:0;align-items:stretch;margin-top:12px}
+  @media(max-width:760px){.split{grid-template-columns:1fr}}
+  .vis{background:linear-gradient(180deg,#F7F9FA,#FFF);border-right:1px solid var(--line-2);padding:10px 12px;display:grid;place-items:center}
+  @media(max-width:760px){.vis{border-right:none;border-bottom:1px solid var(--line-2)}}
+  .vis svg{width:100%;height:auto;max-height:126px;display:block}
+  .side{padding:13px 17px 15px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{appearance:none;cursor:pointer;font-family:var(--sans);font-size:13px;font-weight:500;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:7px 12px;color:var(--ink);transition:.14s;line-height:1.2}
+  .chip:hover{border-color:var(--teal);background:#fff}
+  .chip.on{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px var(--teal-wash)}
+  .chip:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+  .pats{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;padding-top:11px;border-top:1px dashed var(--line)}
+  .pats .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);width:100%;margin-bottom:2px}
+  .pat{appearance:none;cursor:pointer;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 6px 4px;width:64px;transition:.14s}
+  .pat:hover{border-color:var(--teal);background:#fff}
+  .pat.on{border-color:var(--teal);background:#fff;box-shadow:0 0 0 3px var(--teal-wash)}
+  .pat svg{width:100%;height:26px;display:block}
+  .pat span{font-family:var(--mono);font-size:8.5px;color:var(--muted);display:block;text-align:center;margin-top:2px}
+  .pat:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+
+  /* svg atoms */
+  .nd{fill:#20344D}.nd.h{fill:var(--teal)}.nd.dim{fill:#B9C3CD}
+  .ed{stroke:#95B9BE;stroke-width:1.3;fill:none}
+  .ed.dim{stroke:#D3DBE1}
+  .ed.h{stroke:var(--teal);stroke-width:2}
+  .bx{fill:#fff;stroke:var(--line);stroke-width:1}
+  .bx.t{stroke:#A9CFD1;fill:var(--teal-wash)}
+  .bx.r{stroke:#E0BAB4;fill:#FBEDEA}
+  .lbl{font-family:'IBM Plex Mono',monospace;font-size:7px;fill:var(--muted);letter-spacing:.03em}
+  .lbl.t{fill:var(--teal-deep)}.lbl.r{fill:var(--rust)}.lbl.w{fill:#fff}
+  .bar{fill:#E3E8ED}.bar.t{fill:var(--teal)}
+  .arw{stroke:var(--teal);stroke-width:1.4;fill:none;marker-end:url(#am)}
+  .dash{stroke:#C3CCD5;stroke-width:1;stroke-dasharray:2.5 2.5;fill:none}
+  .flowdash{stroke:var(--teal);stroke-width:1.6;fill:none;stroke-dasharray:4 6;animation:mar 1.4s linear infinite}
+  @keyframes mar{to{stroke-dashoffset:-20}}
+
+  .loop{display:grid;grid-template-columns:48px 1fr;gap:16px;margin:-4px 0 10px}
+  @media(max-width:640px){.loop{grid-template-columns:36px 1fr;gap:11px}}
+  .lp{font-family:var(--mono);font-size:10.5px;color:var(--violet);background:var(--violet-wash);border:1px dashed #B9B0DC;border-radius:8px;padding:6px 12px;display:inline-flex;gap:8px}
+  .end{display:grid;grid-template-columns:48px 1fr;gap:16px;margin-top:2px}
+  @media(max-width:640px){.end{grid-template-columns:36px 1fr;gap:11px}}
+  .end .cap{font-family:var(--mono);font-size:10.5px;color:var(--faint);padding-top:6px}
+
+  /* drawer */
+  .drawer{position:fixed;top:0;right:0;height:100%;width:410px;max-width:93vw;background:var(--panel);border-left:1px solid var(--line);box-shadow:-20px 0 50px -30px rgba(16,24,32,.4);transform:translateX(102%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:50;display:flex;flex-direction:column}
+  body.open .drawer{transform:none}
+  .dr-top{padding:19px 22px 14px;border-bottom:1px solid var(--line-2);position:relative;flex:0 0 auto}
+  .dr-tag{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:6px}
+  .dr-top h2{font-family:var(--disp);font-weight:600;font-size:19px;margin:0;line-height:1.2;padding-right:26px}
+  .dr-x{position:absolute;top:15px;right:15px;appearance:none;background:none;border:none;cursor:pointer;color:var(--faint);padding:4px;border-radius:6px}
+  .dr-x:hover{color:var(--ink);background:var(--paper)}
+  .dr-x:focus-visible{outline:2px solid var(--teal)}
+  .dr-body{padding:17px 22px 28px;overflow-y:auto;flex:1;font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+  .dr-body p{margin:0 0 12px}
+  .dr-body b{color:var(--ink);font-weight:600}
+  .dr-body ul{margin:0 0 12px;padding-left:17px}.dr-body li{margin-bottom:6px}
+  .dr-body .kv{font-family:var(--mono);font-size:11.5px;background:var(--paper);border:1px solid var(--line-2);border-radius:8px;padding:11px 13px;margin:0 0 12px;line-height:1.65;white-space:pre-wrap;overflow-x:auto}
+  .dr-body .kv em{font-style:normal;color:var(--teal-deep)}
+  .src{display:inline-block;font-family:var(--mono);font-size:10.5px;color:var(--teal-deep);background:var(--teal-wash);border:1px solid #B7D6D7;border-radius:5px;padding:2px 8px}
+  .dr-nav{padding:11px 22px;border-top:1px solid var(--line-2);display:flex;gap:8px;flex:0 0 auto}
+  .nb{appearance:none;cursor:pointer;font-family:var(--mono);font-size:11px;background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:7px 12px;color:var(--ink-2);flex:1}
+  .nb:hover{border-color:var(--teal);color:var(--teal-deep)}
+  .nb:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+  .scrim{position:fixed;inset:0;background:rgba(16,24,32,.25);opacity:0;pointer-events:none;transition:opacity .28s;z-index:45}
+  body.open .scrim{opacity:1;pointer-events:auto}
+  @media(min-width:1240px){body.open .scrim{opacity:0;pointer-events:none}}
+  /* view toggle */
+  .seg{display:flex;background:#0E1A2E;border:1px solid #3C5170;border-radius:8px;padding:2px;gap:2px}
+  .sg{appearance:none;cursor:pointer;font-family:var(--mono);font-size:11px;background:none;border:none;color:#8FA6BE;padding:5px 11px;border-radius:6px}
+  .sg:hover{color:#DCE8F0}
+  .sg.on{background:#22355A;color:#fff}
+  .sg:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+  #walk[hidden]{display:none}
+
+  /* appendix */
+  .appx{max-width:1010px;margin:0 auto;padding:26px 26px 80px}
+  .appx-h{font-family:var(--disp);font-weight:700;font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
+  .appx-s{font-family:var(--mono);font-size:11px;color:var(--muted);margin:0 0 22px}
+  .acc{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:9px;overflow:hidden}
+  .acc-h{appearance:none;width:100%;cursor:pointer;background:none;border:none;text-align:left;padding:14px 17px;display:flex;align-items:center;gap:12px;font-family:inherit}
+  .acc-h .ax{font-family:var(--mono);font-size:10.5px;color:var(--teal);flex:0 0 auto}
+  .acc-h .at{font-family:var(--disp);font-weight:600;font-size:15px;color:var(--ink);flex:1}
+  .acc-h .ac{font-family:var(--mono);font-size:10px;color:var(--faint)}
+  .acc-h .av{color:var(--faint);transition:transform .22s;flex:0 0 auto}
+  .acc.open .acc-h .av{transform:rotate(90deg)}
+  .acc-h:hover{background:var(--paper)}
+  .acc-h:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+  .acc-b{display:none;padding:2px 17px 18px;border-top:1px solid var(--line-2)}
+  .acc.open .acc-b{display:block}
+  .acc-b p{font-size:13.4px;color:var(--ink-2);line-height:1.6;margin:12px 0}
+  .acc-b p b{color:var(--ink)}
+
+  table.ref{width:100%;border-collapse:collapse;font-size:12.6px;margin:12px 0 4px}
+  table.ref th{font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);text-align:left;font-weight:500;padding:8px 10px;border-bottom:1px solid var(--line)}
+  table.ref td{padding:8px 10px;border-bottom:1px solid var(--line-2);vertical-align:top;color:var(--ink-2)}
+  table.ref tr:last-child td{border-bottom:none}
+  table.ref td.m{font-family:var(--mono);font-size:11.3px;color:var(--teal-deep);white-space:nowrap}
+  table.ref td.s{font-family:var(--mono);font-size:10.5px;color:var(--faint);white-space:nowrap}
+
+  .gal{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 4px}
+  @media(max-width:900px){.gal{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.gal{grid-template-columns:1fr}}
+  .gc{background:var(--paper);border:1px solid var(--line-2);border-radius:11px;padding:12px 12px 11px}
+  .gc svg{width:100%;height:82px;display:block;margin-bottom:8px}
+  .gc .gn{font-family:var(--disp);font-weight:600;font-size:13.5px;margin-bottom:4px}
+  .gc .gd{font-size:11.8px;color:var(--muted);line-height:1.45;margin-bottom:7px}
+  .gc .gs{font-family:var(--mono);font-size:10px;color:var(--teal-deep);background:var(--teal-wash);border:1px solid #B7D6D7;border-radius:5px;padding:2px 6px;display:inline-block;line-height:1.4}
+  .gc .gb{font-size:11.2px;color:var(--muted);margin-top:7px;padding-top:7px;border-top:1px dashed var(--line);line-height:1.45}
+  .gc .gb b{color:var(--safe);font-weight:600}
+
+  .note{background:var(--amber-wash);border:1px solid #E5D0A8;border-radius:9px;padding:12px 14px;font-size:12.8px;color:#6B4A0E;margin:12px 0 0;line-height:1.55}
+  .note b{color:#553A08}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<marker id="am" markerWidth="6" markerHeight="6" refX="4.6" refY="2.2" orient="auto"><path d="M0,0 L4.6,2.2 L0,4.4 Z" fill="#0B6E75"/></marker>
+<marker id="ag" markerWidth="6" markerHeight="6" refX="4.6" refY="2.2" orient="auto"><path d="M0,0 L4.6,2.2 L0,4.4 Z" fill="#95B9BE"/></marker>
+</defs></svg>
+
+<div class="top">
+  <div class="g"><i></i></div>
+  <div><h1>Agentic TM Investigator</h1><small>Workflow · alert to decision</small></div>
+  <div class="tools">
+    <span class="tip"><b>Click any term</b> for detail</span>
+    <div class="seg"><button class="sg on" data-view="flow">Workflow</button><button class="sg" data-view="appx">Appendix</button></div>
+    <button class="walk" id="walk"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Walk the flow</button>
+  </div>
+</div>
+
+<div class="wrap" id="viewFlow">
+  <div class="flow" id="flow"></div>
+  <div class="end"><div></div><div class="cap">↑ every step is logged, replayable, and traceable to a source paper</div></div>
+</div>
+
+<div class="appx" id="viewAppx" hidden>
+  <h2 class="appx-h">Appendix</h2>
+  <p class="appx-s">Reference material · click a section to expand</p>
+  <div id="accHost"></div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-label="Detail">
+  <div class="dr-top">
+    <div class="dr-tag" id="drTag"></div><h2 id="drTitle"></h2>
+    <button class="dr-x" id="drX" aria-label="Close"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="dr-body" id="drBody"></div>
+  <div class="dr-nav"><button class="nb" id="drPrev">← Previous</button><button class="nb" id="drNext">Next →</button></div>
+</aside>
+
+<script>
+/* ---------- per-phase visuals ---------- */
+const V={};
+
+V[0]=`<svg viewBox="0 0 240 126">
+${[["xlsx",8],["xml",30],["csv",52],["tbl",74],["json",96]].map(([f,y],i)=>`
+  <rect class="bx" x="6" y="${y}" width="62" height="18" rx="4"/>
+  <text class="lbl" x="14" y="${y+12}">${f}</text>
+  <rect x="52" y="${y+5}" width="10" height="8" rx="2" fill="#E4EAEF"/>
+  <path class="ed" d="M70,${y+9} C 100,${y+9} 110,63 138,63" marker-end="url(#ag)"/>`).join('')}
+  <rect class="bx" x="6" y="96" width="62" height="18" rx="4"/><text class="lbl" x="14" y="108">notes</text>
+  <path class="ed" d="M70,105 C 100,105 110,63 138,63" marker-end="url(#ag)"/>
+  <circle class="nd h" cx="150" cy="63" r="9"/>
+  <text class="lbl t" x="166" y="60">one</text><text class="lbl t" x="166" y="70">alert case</text>
+</svg>`;
+
+V[1]=`<svg viewBox="0 0 240 126">
+  <text class="lbl r" x="8" y="12">RAW</text>
+  ${[0,1,2,3,4].map(i=>`<rect class="bx r" x="8" y="${20+i*19}" width="${[74,58,80,50,68][i]}" height="13" rx="3"/>`).join('')}
+  <path class="flowdash" d="M104,63 L134,63"/>
+  <path class="arw" d="M116,63 L134,63"/>
+  <text class="lbl t" x="146" y="12">CANONICAL</text>
+  ${[0,1,2,3,4].map(i=>`<rect class="bx t" x="146" y="${20+i*19}" width="86" height="13" rx="3"/>`).join('')}
+</svg>`;
+
+V[2]=`<svg viewBox="0 0 240 126">
+  <rect class="bx" x="6" y="24" width="78" height="16" rx="4"/><text class="lbl" x="12" y="35">NAME VARIANT A</text>
+  <rect class="bx" x="6" y="55" width="78" height="16" rx="4"/><text class="lbl" x="12" y="66">NAME VARIANT B</text>
+  <rect class="bx" x="6" y="86" width="78" height="16" rx="4"/><text class="lbl" x="12" y="97">NAME VARIANT C</text>
+  <path class="ed" d="M86,32 C 118,32 122,63 148,63"/>
+  <path class="ed" d="M86,63 L148,63"/>
+  <path class="ed" d="M86,94 C 118,94 122,63 148,63"/>
+  <circle class="nd h" cx="160" cy="63" r="11"/>
+  <text class="lbl t" x="176" y="60">one</text><text class="lbl t" x="176" y="70">entity id</text>
+  <path class="dash" d="M96,44 L140,44"/><text class="lbl" x="98" y="41">review band</text>
+</svg>`;
+
+V[3]=`<svg viewBox="0 0 240 126">
+  <path class="ed" d="M52,34 L118,20"/><path class="ed" d="M52,34 L96,66"/>
+  <path class="ed" d="M96,66 L162,44"/><path class="ed" d="M96,66 L140,100"/>
+  <path class="ed" d="M162,44 L206,72"/><path class="ed" d="M140,100 L206,72"/>
+  <path class="ed" d="M118,20 L162,44"/>
+  <circle class="nd" cx="52" cy="34" r="6"/><circle class="nd" cx="118" cy="20" r="6"/>
+  <circle class="nd" cx="96" cy="66" r="6"/><circle class="nd" cx="162" cy="44" r="6"/>
+  <circle class="nd" cx="140" cy="100" r="6"/><circle class="nd" cx="206" cy="72" r="6"/>
+  <rect class="bx" x="6" y="102" width="52" height="16" rx="4"/><text class="lbl" x="11" y="113">accounts</text>
+  <text class="lbl" x="150" y="16">edges = transactions</text>
+</svg>`;
+
+V[4]=`<svg viewBox="0 0 240 126">
+  <circle cx="120" cy="60" r="50" fill="none" stroke="#A9CFD1" stroke-width="1" stroke-dasharray="3 3"/>
+  <text class="lbl t" x="172" y="20">k-hop scope</text>
+  <path class="ed dim" d="M20,26 L58,44"/><path class="ed dim" d="M214,104 L176,88"/>
+  <path class="ed h" d="M92,58 L152,58"/>
+  <path class="ed" d="M152,58 L176,88"/><path class="ed" d="M92,58 L58,44"/>
+  <path class="ed" d="M152,58 L164,30"/>
+  <circle class="nd dim" cx="20" cy="26" r="5"/><circle class="nd dim" cx="214" cy="104" r="5"/>
+  <circle class="nd h" cx="92" cy="58" r="7"/><circle class="nd h" cx="152" cy="58" r="7"/>
+  <circle class="nd" cx="58" cy="44" r="5"/><circle class="nd" cx="176" cy="88" r="5"/><circle class="nd" cx="164" cy="30" r="5"/>
+  <text class="lbl t" x="96" y="80">anchor edge</text>
+</svg>`;
+
+V[5]=`<svg viewBox="0 0 240 126">
+  ${[["vs own",26],["vs declared",63],["vs peer",100]].map(([l,y],i)=>`
+    <text class="lbl" x="6" y="${y-9}">${l}</text>
+    <rect class="bar" x="6" y="${y-4}" width="226" height="7" rx="3.5"/>
+    <rect class="bar t" x="6" y="${y-4}" width="${[150,186,120][i]}" height="7" rx="3.5"/>
+    <circle cx="${[150,186,120][i]+6}" cy="${y-0.5}" r="5" fill="#fff" stroke="var(--teal)" stroke-width="2"/>`).join('')}
+  <path class="dash" d="M96,14 L96,116"/><text class="lbl" x="99" y="120">expected</text>
+</svg>`;
+
+V[6]=`<svg viewBox="0 0 240 126">
+  <path class="ed" d="M28,40 L58,26"/><path class="ed" d="M28,40 L52,62"/>
+  <circle class="nd h" cx="28" cy="40" r="5"/><circle class="nd" cx="58" cy="26" r="5"/><circle class="nd" cx="52" cy="62" r="5"/>
+  <text class="lbl" x="14" y="86">subgraph</text>
+  <path class="arw" d="M74,44 L94,44"/>
+  ${[0,1,2,3].map(i=>`<rect class="bx" x="100" y="${22+i*11}" width="${[62,54,66,46][i]}" height="6" rx="2"/>`).join('')}
+  <text class="lbl" x="100" y="80">serialised text</text>
+  <path class="arw" d="M170,44 L186,44"/>
+  ${[0,1,2].map(i=>`<rect class="bx t" x="${192+i*4}" y="${26+i*9}" width="40" height="24" rx="4"/>`).join('')}
+  <text class="lbl t" x="192" y="86">evidence</text><text class="lbl t" x="192" y="95">bundle</text>
+</svg>`;
+
+V[7]=`<svg viewBox="0 0 240 126">
+  <rect class="bx" x="6" y="52" width="54" height="20" rx="5"/><text class="lbl" x="11" y="65">typologies</text>
+  <path class="arw" d="M62,62 L84,62"/>
+  <circle cx="98" cy="62" r="11" fill="#F8EFDD" stroke="#DDBE86"/><text class="lbl" x="90" y="65" style="fill:#A9690C">plan</text>
+  ${[[176,16],[186,44],[186,80],[176,108]].map(([x,y],i)=>`
+    <path class="ed" d="M110,62 C 140,62 146,${y+8} ${x-8},${y+8}"/>
+    <rect class="bx" x="${x-8}" y="${y}" width="56" height="17" rx="4"/>
+    <text class="lbl" x="${x-3}" y="${y+11}">${["fraud","velocity","country","text"][i]}</text>`).join('')}
+</svg>`;
+
+V[8]=`<svg viewBox="0 0 240 126">
+  ${[["provenance",14],["consistency",44],["counterfactual",74]].map(([l,y])=>`
+    <rect class="bx" x="46" y="${y}" width="98" height="20" rx="5"/>
+    <text class="lbl" x="54" y="${y+13}">${l}</text>`).join('')}
+  <path class="ed" d="M20,24 L46,24"/><path class="ed" d="M144,24 C 168,24 24,44 46,54" />
+  <path class="ed" d="M144,54 C 168,54 24,74 46,84"/>
+  <path class="arw" d="M144,84 L188,84"/>
+  <rect class="bx t" x="188" y="74" width="46" height="20" rx="5"/><text class="lbl t" x="196" y="87">release</text>
+  <path class="ed" d="M96,102 C 60,116 30,110 22,32" stroke="#B9B0DC" stroke-dasharray="3 3" marker-end="url(#ag)"/>
+  <text class="lbl" x="60" y="118" style="fill:#5A4A9C">fail → repair</text>
+</svg>`;
+
+V[9]=`<svg viewBox="0 0 240 126">
+  <rect class="bx" x="20" y="14" width="104" height="98" rx="6"/>
+  ${[0,1,2,3,4].map(i=>`<rect class="bar" x="32" y="${30+i*13}" width="${[78,60,80,52,70][i]}" height="5" rx="2.5"/>`).join('')}
+  <text class="lbl" x="32" y="26">draft narrative</text>
+  <path class="arw" d="M130,62 L152,62"/>
+  <circle cx="182" cy="46" r="12" fill="var(--safe-wash)" stroke="#96C5AB"/>
+  <path d="M176,46 l4,4 l8,-8" fill="none" stroke="var(--safe)" stroke-width="2"/>
+  <path d="M170,74 h24 M170,82 h24" stroke="#96C5AB" stroke-width="1.4"/>
+  <text class="lbl" x="164" y="98" style="fill:#2C7A54">investigator</text>
+  <text class="lbl" x="164" y="108" style="fill:#2C7A54">signs</text>
+</svg>`;
+
+V[10]=`<svg viewBox="0 0 240 126">
+  ${[["synthetic",6],["backtest",64],["shadow",122],["guarded",180]].map(([l,x],i)=>`
+    <rect class="bx${i<2?' t':''}" x="${x}" y="44" width="52" height="26" rx="6"/>
+    <text class="lbl${i<2?' t':''}" x="${x+7}" y="60">${l}</text>
+    ${i<3?`<path class="arw" d="M${x+53},57 L${x+62},57"/>`:''}`).join('')}
+  <text class="lbl" x="6" y="34">no live use until each gate passes</text>
+  <path class="dash" d="M6,84 L232,84"/>
+  <text class="lbl" x="6" y="98">metrics reported per typology &amp; segment</text>
+</svg>`;
+
+/* ---------- phases ---------- */
+const PHASES=[
+{n:"01",t:"Alert arrives",who:"eng",whoL:"intake",items:[
+ ["Transaction list","Per-entity exports, usually Excel or CSV. Locale-dependent decimal marks, differing date patterns, merged headers, footer rows, mixed encodings.<p>Nothing is parsed ad hoc — every source enters through a contract in step 02.</p>","[P2] §5.2"],
+ ["KYC / CDD","Customer type, industry, risk rating, ownership signals, onboarding notes, declared expected activity.<p>Becomes the <b>declared baseline</b> that observed behaviour is later measured against.</p>","[P3] §2.2c"],
+ ["TM alerts","Triggering rules and scores, thresholds, alert window, and the transaction set that breached.<p>Those breaching transactions become the <b>anchor edges</b> of the case in step 05.</p>","[P3] §2.2a"],
+ ["Relationships","Account and customer links, shared attributes such as address or contact data, ownership chains.<p>Become attribute-link edges in the graph.</p>","[P2] §5.12"],
+ ["Screening","Sanctions, PEP and adverse-media results.<p>Carried with match confidence intact — never silently promoted to fact.</p>","[P3] §2.2"],
+ ["Prior cases","Earlier alerts, dispositions and investigator notes, indexed as case memory.<p>Restricted to reviewed cases, so past error is not amplified by retrieval.</p>","[P3] §2.2e"]
+]},
+{n:"02",t:"Normalise",who:"eng",whoL:"engine",items:[
+ ["Ingestion contract","A versioned spec per source — where Excel reality is absorbed in one place.<div class='kv'><em>format</em>       sheet, encoding\n<em>locale</em>       decimal mark, date pattern\n<em>header_map</em>   source column → canonical field\n<em>mandatory</em>    fields that must be present\n<em>row_gates</em>    parse, numeric, direction resolvable\n<em>file_gates</em>   rowcount, period coverage, dedup hash</div><p>A row either satisfies the contract or is <b>quarantined with a reject code</b>. Nothing is silently coerced.</p>","[P2] §5.2"],
+ ["Canonical event","Every accepted row rewritten to one typed grain.<ul><li><b>Hashed event ID</b> — re-ingestion is idempotent</li><li><b>Dual amount</b> — original preserved, plus conversion with its rate reference</li><li><b>UTC timestamps</b>, source offset retained</li><li><b>Enums</b> for direction and channel; free text kept in raw fields</li><li><b>Lineage</b> to file, sheet, row on every field</li></ul>","[P2] §5.2 · [P3] R6"]
+]},
+{n:"03",t:"Resolve entities",who:"eng",whoL:"engine",items:[
+ ["Entity resolution","Counterparty strings from different systems naming the same real party are merged before anything is graphed.<p>Three bands: auto-merge above the upper threshold, human queue in the middle, stay distinct below. Survivorship rules pick canonical attributes.</p><p>Every merge is logged and reversible.</p>","[P1] §2.1"]
+]},
+{n:"04",t:"Build the graph",who:"eng",whoL:"engine",items:[
+ ["Knowledge graph","Nodes are accounts and banks; edges are transactions carrying amount and timestamp. Node metadata includes entity type and creation date.<div class='kv'><em>transfers_to</em>          one edge per canonical event\n<em>belongs_to</em>            account → institution\n<em>linked_by_attribute</em>   shared address, contact\n<em>owns</em>                  ownership chains from KYC</div><p>Laundering is a network phenomenon — invisible in a flat statement, legible in a graph.</p>","[P1] §2.1"]
+]},
+{n:"05",t:"Scope the case",who:"eng",whoL:"engine",items:[
+ ["k-hop subgraph","The alerted edges are anchors. The extractor takes their k-hop neighbourhood — source and destination accounts, neighbouring transactions, associated banks.<p>k is tuned per rule family. Expansion caps keep the case legible; when a cap truncates, the truncation is <b>recorded and surfaced as missing evidence</b> rather than dropped silently.</p>","[P1] §2.1"]
+]},
+{n:"06",t:"Compute the facts",who:"eng",whoL:"engine",items:[
+ ["Feature dossier","All arithmetic happens here, in code, before any model sees the case.<p>Each feature carries its formula reference and contributing event IDs — which is what lets the verifier later re-execute any figure the model cites.</p>","[P3] R6"],
+ ["Three baselines","Every figure is framed against three reference points:<div class='kv'><em>vs own</em>        customer's trailing distribution\n<em>vs declared</em>   the KYC expected band\n<em>vs peer</em>       segment percentile</div><p>A number means nothing without an expectation to compare it to — and baselines rule benign explanations <b>in</b> as often as out.</p>","[P2] §5.4"]
+]},
+{n:"07",t:"Package for the AI",who:"eng",whoL:"engine",items:[
+ ["Serialization","The subgraph becomes structured text: role-tagged entities, relations preserving direction, timestamps and values, in temporal order. No summarising.<div class='kv'>[<em>&lt;T0&gt;</em>]   <em>&lt;ACCT_A&gt;</em> transfers_to <em>&lt;ACCT_B&gt;</em>\n        (amount=<em>&lt;AMT&gt;</em> <em>&lt;CCY&gt;</em>, channel=<em>&lt;CH&gt;</em>)  ← ANCHOR\n[<em>&lt;T0+δ&gt;</em>] <em>&lt;ACCT_B&gt;</em> transfers_to <em>&lt;ACCT_C&gt;</em></div><p>Fixed template, fixed ordering — identical subgraphs always serialise identically, which is what makes caching and audit replay possible.</p>","[P1] §2.2"],
+ ["Evidence bundle","Everything citable becomes an evidence item.<div class='kv'><em>evidence_id</em>     stable identifier\n<em>source_type</em>     policy | kyc | trigger | subgraph\n                | feature | prior_case\n<em>effective_ts</em>    version timestamp\n<em>acl_tag</em>         access-control label\n<em>canonical_text</em>  retrieval and citation form\n<em>structured</em>      typed fields for the verifier</div><p>Assembly: structured filters first (customer, window, rule, ACL), then semantic ranking. Per-type quotas, deduplication, latest policy versions only.</p><p><b>What is retrievable defines what the model can assert.</b></p>","[P3] §2.2, §3.2"],
+ ["Privacy guard","Sensitive entities replaced with reversible tokens before any model call; the map stays inside the trust boundary.<p>Analysis runs masked → narrative unmasked for the investigator → re-masked before anything leaves for external review.</p>","[P2] §5.3"],
+ ["Few-shot exemplars","The prompt carries serialised demonstrations of the canonical laundering topologies, each with an analyst-style rationale grounded in structure — <b>plus benign counter-examples</b>, so the model learns to distinguish rather than only to accuse.</p>","[P1] §2.3"],
+ ["Routing","Not every alert needs the full pipeline. A lightweight scorer triages the queue; only ambiguous or high-risk alerts continue through agents, verification and counterfactuals.<p>Repair and counterfactual budgets are capped per alert.</p>","[P1] §4 · [P3] §7.5"]
+],pats:true},
+{n:"08",t:"Investigate",who:"ai",whoL:"AI",items:[
+ ["Crime-type detector","Risk-indicator extraction plus tree-based ensembles over the computed features produce <b>ranked typologies with confidence scores</b>.<p>This is what sets the scope — the LLM does not choose its own.</p>","[P2] §5.4"],
+ ["Planning agent","Reads the ranked typologies and spawns only the relevant specialists. Event-driven rather than hard-coded, so new typologies can be added without touching the rest.","[P2] §5.5"],
+ ["Typology agents","One per candidate typology — transaction fraud, volume and velocity, country risk, textual content, geographic anomaly, account health, dispute patterns.<p>Each examines the bundle for its own pattern, gathering evidence <b>for and against</b>.</p>","[P2] §5.6"],
+ ["External intelligence","Pulls negative news, sanctions alerts and regulatory advisories through standardised tool interfaces rather than bespoke integrations.","[P2] §5.7"],
+ ["Triage writer","Fills the output contract. May assert only what it can cite from the bundle by evidence ID.<p>It writes; it never calculates.</p>","[P3] §3.3"]
+]},
+{n:"09",t:"Verify",who:"chk",whoL:"gates",items:[
+ ["Output contract","Not an essay — a schema.<div class='kv'><em>disposition</em>      dismiss | monitor | escalate\n<em>confidence</em>       calibrated\n<em>typologies</em>       ranked\n<em>rationale</em>        each paragraph ≥1 citation\n<em>supporting</em>       evidence IDs\n<em>contradicting</em>    evidence IDs\n<em>missing</em>          what was sought, not found\n<em>next_actions</em>     RFI, wider lookback, related accounts\n<em>counterfactuals</em>  validated flip conditions</div><p>Absence of corroboration is decision-relevant, so <b>missing</b> is a required field.</p>","[P3] §2.3"],
+ ["Provenance check","Every cited evidence ID must exist in the supplied bundle. Fabricated citations are rejected outright.","[P3] §3.3"],
+ ["Consistency check","Every amount, date, ordering and threshold comparison in the rationale is checked against the structured fields of the cited item.","[P3] §3.3"],
+ ["Repair loop","A failed check returns targeted feedback — cited ID absent, stated total conflicts with evidence — and triggers bounded regeneration.<p>The draft <b>cannot reach the investigator</b> until checks pass.</p>","[P3] §3.3"],
+ ["Decision counterfactual","Minimal plausible edits within a budget: toggle a claimed key indicator, adjust a counterparty risk tier, narrow the window, remove one graph path.<p>Tests whether the stated drivers are <b>actually</b> decision-relevant.</p>","[P3] §3.4"],
+ ["Evidence counterfactual","Remove a critical cited item and re-run. The model must stop citing it and adjust coherently.<p>The direct test against <b>decorative citations</b> — explanations that sound grounded but do not drive the decision.</p>","[P3] §3.4"],
+ ["Agent-as-a-judge","A live validation agent scores each narrative for coherence, alignment with the typology agents' findings, and regulatory completeness before release.","[P2] §5.9, §8"]
+]},
+{n:"10",t:"Investigator decides",who:"hum",whoL:"human",items:[
+ ["Sign-off","The system drafts. It never dismisses or escalates on its own. The investigator reviews, edits or overrides, and records the decision.","[P2] §9"],
+ ["Feedback capture","Edits and overrides are captured structurally and fed into subsequent cycles rather than lost in a document.","[P2] §5.10"],
+ ["Audit trail","Every retrieval, tool call, intermediate artifact, verifier result and counterfactual outcome is logged.<p>Any narrative can be reconstructed and re-verified after the fact.</p>","[P3] §7.2"]
+]},
+{n:"11",t:"Prove it before live use",who:"hum",whoL:"before live",items:[
+ ["Metrics","Escalate precision, recall and PR-AUC; citation validity; evidence support; counterfactual flip rate and faithfulness; numerical and policy hallucination rates.<p>Reported per typology and per segment, never in aggregate.</p>","[P3] §5"],
+ ["Protocol","Time-aware splits — train on earlier alerts, test on later ones. Case memory indexes training-period cases only, so retrieval cannot become a label channel.","[P3] §4.4"],
+ ["Rollout","Synthetic benchmarks → historical backtest on adjudicated cases → shadow mode → guarded assist with mandatory sign-off.","[P3] §7.3"],
+ ["The three papers","<b>[P1]</b> In-Context Learning of LLMs for Money Laundering Detection in Financial Graphs — Pirmorad, Vanguard · arXiv:2507.14785<br><span style='color:#5E6976'>graph representation, k-hop scoping, serialisation, few-shot typologies</span><p><b>[P2]</b> Co-Investigator AI — Naik et al. · arXiv:2509.08380<br><span style='color:#5E6976'>ingestion layer, privacy guard, crime-type detection, agent decomposition, judge agent</span></p><p><b>[P3]</b> Explainable AML Triage with LLMs — Torres, Cheng &amp; Hu · arXiv:2604.19755<br><span style='color:#5E6976'>evidence model, retrieval, output contract, verifier, counterfactuals</span></p><p>Key finding from [P3]: the LLM alone was the <b>weakest</b> method tested — below gradient boosting. The same LLM inside this evidence-constrained, verified loop was the <b>strongest</b>, beating rules, tabular and graph baselines.</p>","basis"]
+]}
+];
+
+const PAT=[
+ ["Fan-out","One source disperses to many recipients in a short window — a common way to obscure origin."],
+ ["Fan-in","Many sources converge into one account."],
+ ["Gather-scatter","Funds from multiple sources converge briefly, then disperse again — a classic layering tactic."],
+ ["Scatter-gather","Funds disperse, then re-converge downstream."],
+ ["Cycle","Funds return to their origin after passing through intermediaries."],
+ ["Bipartite","Dense many-to-many activity, consistent with mule networks or coordinated bursts."],
+ ["Stack","A layered chain of intermediaries, each passing funds onward."],
+ ["Random","Irregular, low-structure flow — the hardest class to recognise reliably."]
+];
+function nds(l){return l.map(([x,y,h])=>`<circle class="nd${h?' h':''}" cx="${x}" cy="${y}" r="3.6"/>`).join('')}
+function egs(l){return l.map(([a,b,c,d])=>`<path class="ed" d="M${a},${b} L${c},${d}"/>`).join('')}
+const PSVG=[
+ egs([[16,24,48,8],[16,24,48,20],[16,24,48,30],[16,24,48,42]])+nds([[16,24,1],[52,8],[52,20],[52,30],[52,42]]),
+ egs([[20,8,52,24],[20,20,52,24],[20,30,52,24],[20,42,52,24]])+nds([[16,8],[16,20],[16,30],[16,42],[56,24,1]]),
+ egs([[12,10,34,24],[12,24,34,24],[12,38,34,24],[38,24,60,10],[38,24,60,24],[38,24,60,38]])+nds([[8,10],[8,24],[8,38],[36,24,1],[64,10],[64,24],[64,38]]),
+ egs([[12,24,34,10],[12,24,34,24],[12,24,34,38],[38,10,60,24],[38,24,60,24],[38,38,60,24]])+nds([[8,24,1],[36,10],[36,24],[36,38],[64,24,1]]),
+ egs([[22,10,50,10],[54,14,54,34],[50,38,22,38],[18,34,18,14]])+nds([[18,10,1],[54,10],[54,38],[18,38]]),
+ egs([[16,9,54,13],[16,9,54,29],[16,24,54,13],[16,24,54,40],[16,39,54,29],[16,39,54,40]])+nds([[16,9],[16,24],[16,39],[58,13],[58,29],[58,40]]),
+ egs([[14,24,30,24],[34,24,50,24],[54,24,66,24]])+nds([[12,24,1],[32,24],[52,24],[68,24]]),
+ egs([[14,12,36,28],[36,28,58,10],[36,28,26,42],[58,10,64,34]])+nds([[14,12],[36,28],[58,10],[26,42],[64,34]])
+];
+
+/* build */
+const FLAT=[]; let html='';
+PHASES.forEach((p,pi)=>{
+  let chips='';
+  p.items.forEach(it=>{
+    const id=FLAT.length;
+    FLAT.push({tag:`Step ${p.n} · ${p.t}`,title:it[0],body:it[1],src:it[2]});
+    chips+=`<button class="chip" data-id="${id}">${it[0]}</button>`;
+  });
+  let pats='';
+  if(p.pats){
+    pats='<div class="pats"><span class="lbl" style="font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);width:100%;margin-bottom:2px">canonical topologies shown as demonstrations</span>';
+    PAT.forEach((q,qi)=>{
+      const id=FLAT.length;
+      FLAT.push({tag:"Typology · demonstration",title:q[0],body:`<p>${q[1]}</p><p>Presented to the model as a serialised subgraph in the step 07 format, paired with an analyst-style rationale grounded in structure rather than surface statistics.</p>`,src:"[P1] §2.3"});
+      pats+=`<button class="pat" data-id="${id}"><svg viewBox="0 0 76 48" aria-hidden="true">${PSVG[qi]}</svg><span>${q[0]}</span></button>`;
+    });
+    pats+='</div>';
+  }
+  html+=`<div class="phase" data-p="${pi}">
+    <div class="marker"><div class="n">${p.n}</div></div>
+    <div class="card">
+      <div class="hd"><span class="ttl">${p.t}</span><span class="who ${p.who}">${p.whoL}</span></div>
+      <div class="split">
+        <div class="vis">${V[pi]}</div>
+        <div class="side"><div class="chips">${chips}</div>${pats}</div>
+      </div>
+    </div>
+  </div>`;
+  if(p.n==="09") html+=`<div class="loop"><div></div><div><span class="lp">↺ fails a gate → back to step 08 with targeted feedback</span></div></div>`;
+});
+document.getElementById('flow').innerHTML=html;
+
+/* drawer */
+let cur=null;
+const body=document.body;
+function open(id){
+  const d=FLAT[id]; if(!d)return; cur=id;
+  document.querySelectorAll('.chip,.pat').forEach(e=>e.classList.toggle('on',+e.dataset.id===id));
+  document.getElementById('drTag').textContent=d.tag;
+  document.getElementById('drTitle').textContent=d.title;
+  document.getElementById('drBody').innerHTML=`<p>${d.body}</p>${d.src!=='basis'?`<span class="src">${d.src}</span>`:''}`;
+  document.getElementById('drBody').scrollTop=0;
+  body.classList.add('open');
+}
+function close(){body.classList.remove('open');cur=null;document.querySelectorAll('.chip,.pat').forEach(e=>e.classList.remove('on'));}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('.chip,.pat');
+  if(t){open(+t.dataset.id);return;}
+  if(e.target.closest('#drX')||e.target.id==='scrim')close();
+});
+document.getElementById('drPrev').addEventListener('click',()=>{if(cur!==null)open((cur-1+FLAT.length)%FLAT.length)});
+document.getElementById('drNext').addEventListener('click',()=>{if(cur!==null)open((cur+1)%FLAT.length)});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')close();
+  if(cur===null)return;
+  if(e.key==='ArrowRight'){e.preventDefault();open((cur+1)%FLAT.length)}
+  if(e.key==='ArrowLeft'){e.preventDefault();open((cur-1+FLAT.length)%FLAT.length)}
+});
+
+/* walk */
+const phases=document.querySelectorAll('.phase');
+let timer=null;
+document.getElementById('walk').addEventListener('click',()=>{
+  if(timer){clearInterval(timer);timer=null;phases.forEach(p=>p.classList.remove('lit','past'));return;}
+  close();let i=0;
+  const step=()=>{
+    phases.forEach((p,k)=>{p.classList.toggle('lit',k===i);p.classList.toggle('past',k<i)});
+    phases[i].scrollIntoView({behavior:'smooth',block:'center'});
+    i++;
+    if(i>=phases.length){clearInterval(timer);timer=null;setTimeout(()=>phases.forEach(p=>p.classList.remove('lit','past')),1600);}
+  };
+  step();timer=setInterval(step,1400);
+});
+
+/* ================= APPENDIX ================= */
+const GAL=[
+ ["Fan-out","One account disperses funds to many recipients in a short window.","concentration of outbound to new parties · tight time clustering","Payroll runs, supplier settlement cycles and dividend distributions look identical — segment and declared purpose separate them."],
+ ["Fan-in","Many accounts converge funds into one.","many-to-one inbound · unrelated payers","Legitimate for collection accounts, marketplaces, rental agents and clubs."],
+ ["Gather-scatter","Funds converge briefly, then disperse again — classic layering.","short dwell time between in and out · low residual balance","Treasury sweeps and escrow flow produce the same shape with documented purpose."],
+ ["Scatter-gather","Funds disperse, then re-converge downstream.","outbound split then recombination at a common endpoint","Multi-account cash management within one corporate group."],
+ ["Cycle","Funds return to origin after passing through intermediaries.","closed loop in the directed graph","Genuine round-trip settlement and refunds/reversals — check whether the return leg is a reversal reference."],
+ ["Bipartite","Dense many-to-many between two sets of accounts — mule-network shape.","high edge density between disjoint sets · repeated small amounts","Marketplace and gig-platform payouts create dense bipartite structure legitimately."],
+ ["Stack","A layered chain of intermediaries, each passing funds onward.","long directed path · similar amounts along the chain","Correspondent and nested payment chains in trade finance."],
+ ["Random","Irregular, low-structure flow.","no recognisable motif · the hardest class","Also the shape of ordinary retail behaviour — weak evidence on its own, must combine with other indicators."]
+];
+
+const APPX=[
+{x:"A1",t:"Financial graph topologies",c:"8 patterns",html:()=>`
+ <p>The canonical laundering structures used as few-shot demonstrations in step 07. Each is shown to the model as a serialised subgraph paired with an analyst-style rationale grounded in structure rather than surface statistics.</p>
+ <div class="gal">${GAL.map((g,i)=>`<div class="gc">
+   <svg viewBox="0 0 76 48" aria-hidden="true">${PSVG[i]}</svg>
+   <div class="gn">${g[0]}</div><div class="gd">${g[1]}</div>
+   <span class="gs">${g[2]}</span>
+   <div class="gb"><b>Benign look-alike:</b> ${g[3]}</div></div>`).join('')}</div>
+ <div class="note"><b>Why benign look-alikes are listed.</b> The exemplar library deliberately includes non-suspicious cases alongside the suspicious ones, so the model learns to distinguish rather than only to accuse. Recognition performance is strongest on highly organised patterns (fan-out, fan-in) and weakest on the unstructured ones — which is why topology is never the sole basis for a disposition.</div>`},
+
+{x:"A2",t:"Graph schema",c:"nodes · edges",html:()=>`
+ <table class="ref"><thead><tr><th>Node</th><th>Carries</th></tr></thead><tbody>
+ <tr><td class="m">Customer</td><td>Risk tier, segment, tenure, declared expected activity, CDD refresh state</td></tr>
+ <tr><td class="m">Account</td><td>Entity type, creation date, product, institution reference, status</td></tr>
+ <tr><td class="m">Counterparty</td><td>Resolved identity, incorporation date where known, jurisdiction, own alert history flag</td></tr>
+ <tr><td class="m">Bank</td><td>Institution identifier, jurisdiction</td></tr>
+ </tbody></table>
+ <table class="ref"><thead><tr><th>Edge</th><th>Direction</th><th>Attributes</th></tr></thead><tbody>
+ <tr><td class="m">transfers_to</td><td class="s">directed</td><td>Amount, currency, timestamp, channel, originating event ID</td></tr>
+ <tr><td class="m">belongs_to</td><td class="s">directed</td><td>Account to institution</td></tr>
+ <tr><td class="m">linked_by_attribute</td><td class="s">undirected</td><td>Attribute type — address, contact, device, registration data</td></tr>
+ <tr><td class="m">owns</td><td class="s">directed</td><td>Ownership or control chain from KYC, with stated percentage where held</td></tr>
+ </tbody></table>`},
+
+{x:"A3",t:"Feature catalogue",c:"computed in code",html:()=>`
+ <p>Every family below is a documented, versioned formula over canonical events. Each computed value carries its formula reference and contributing event IDs, which is what allows the verifier to re-execute any figure the model cites.</p>
+ <table class="ref"><thead><tr><th>Family</th><th>What it captures</th><th>Typology signal</th></tr></thead><tbody>
+ <tr><td class="m">Window totals</td><td>Credit and debit turnover, transaction counts per period</td><td class="s">volume anomaly</td></tr>
+ <tr><td class="m">Velocity &amp; burstiness</td><td>Rate of activity and its concentration in time</td><td class="s">fan-out, fan-in</td></tr>
+ <tr><td class="m">Counterparty concentration</td><td>How much flow sits with how few parties</td><td class="s">funnel, mule</td></tr>
+ <tr><td class="m">Pass-through interval</td><td>Distribution of time between matched inflow and outflow</td><td class="s">gather-scatter</td></tr>
+ <tr><td class="m">Round-amount share</td><td>Proportion of amounts at round denominations</td><td class="s">non-commercial flow</td></tr>
+ <tr><td class="m">Sub-threshold clustering</td><td>Amounts clustered just below the applicable reporting limit</td><td class="s">structuring</td></tr>
+ <tr><td class="m">New-counterparty share</td><td>Flow to or from parties first seen inside the window</td><td class="s">layering</td></tr>
+ <tr><td class="m">Channel &amp; corridor mix</td><td>Distribution across payment types and jurisdictions</td><td class="s">country risk</td></tr>
+ <tr><td class="m">Cash intensity</td><td>Cash share of activity relative to declared business model</td><td class="s">placement</td></tr>
+ <tr><td class="m">Balance behaviour</td><td>Residual balance after flow, dwell time of funds</td><td class="s">pass-through</td></tr>
+ </tbody></table>
+ <p>Each is then expressed against three baselines — the customer's own trailing distribution, the KYC-declared band, and the peer-segment position.</p>`},
+
+{x:"A4",t:"Evidence types",c:"citable artifacts",html:()=>`
+ <p>Only these are retrievable, and therefore only these can be asserted. Each item carries a stable identifier, source type, effective timestamp, access-control label, a canonical text form for citation, and structured fields for machine verification.</p>
+ <table class="ref"><thead><tr><th>Type</th><th>Contents</th><th>Retrieval quota</th></tr></thead><tbody>
+ <tr><td class="m">policy</td><td>Institution policy, typology guidance, monitoring playbooks, per-rule model cards</td><td class="s">latest effective version only</td></tr>
+ <tr><td class="m">kyc</td><td>Customer profile attributes, declared activity, ownership, onboarding notes</td><td class="s">scoped to subject</td></tr>
+ <tr><td class="m">trigger</td><td>Rule identifiers, thresholds, model scores, alert window</td><td class="s">all fired rules in cluster</td></tr>
+ <tr><td class="m">subgraph</td><td>Serialised k-hop transaction structure around the anchors</td><td class="s">one per case</td></tr>
+ <tr><td class="m">feature</td><td>Computed aggregates with baselines and lineage</td><td class="s">ranked by deviation</td></tr>
+ <tr><td class="m">prior_case</td><td>Similar historical cases, dispositions, investigator notes</td><td class="s">reviewed cases only</td></tr>
+ <tr><td class="m">external</td><td>Negative news, sanctions advisories, regulatory notices</td><td class="s">on demand by agent</td></tr>
+ </tbody></table>`},
+
+{x:"A5",t:"Typology agents",c:"specialists",html:()=>`
+ <p>Spawned selectively by the planning agent based on the ranked output of the crime-type detector — not all of them run on every case.</p>
+ <table class="ref"><thead><tr><th>Agent</th><th>Looks for</th></tr></thead><tbody>
+ <tr><td class="m">Transaction fraud</td><td>Suspicious transaction patterns indicative of fraud</td></tr>
+ <tr><td class="m">Payment volume &amp; velocity</td><td>Abnormal transaction frequency or high-volume activity</td></tr>
+ <tr><td class="m">Country risk</td><td>Exposure to high-risk or sanctioned jurisdictions</td></tr>
+ <tr><td class="m">Textual content</td><td>Anomalies in customer communications and transaction notes</td></tr>
+ <tr><td class="m">Geographic anomaly</td><td>Location-based inconsistencies</td></tr>
+ <tr><td class="m">Account health</td><td>Historical account activity suggesting compromise or misuse</td></tr>
+ <tr><td class="m">Dispute patterns</td><td>Suspicious or fraudulent dispute and chargeback claims</td></tr>
+ </tbody></table>
+ <p><b>Crime types in scope beyond core laundering:</b> elder financial exploitation, romance scams, human trafficking, money-mule schemes, terrorist financing, identity theft, and general fraud schemes — frequently overlapping within a single case, which is why the detector produces a ranked list rather than one label.</p>`},
+
+{x:"A6",t:"Memory layers",c:"persistent context",html:()=>`
+ <p>Distinct from per-case retrieval: these persist and update across cases, rather than being injected fresh at inference time.</p>
+ <table class="ref"><thead><tr><th>Layer</th><th>Holds</th><th>Used for</th></tr></thead><tbody>
+ <tr><td class="m">Regulatory</td><td>Current AML standards, compliance guidance, narrative-quality benchmarks</td><td>Ensuring drafts meet current expectations</td></tr>
+ <tr><td class="m">Historical narrative</td><td>Prior approved narratives and their outcomes</td><td>Consistency of structure and quality over time</td></tr>
+ <tr><td class="m">Typology-specific</td><td>Past analytical patterns and risk indicators per typology</td><td>Contextually precise risk assessment</td></tr>
+ </tbody></table>`},
+
+{x:"A7",t:"System requirements",c:"design constraints",html:()=>`
+ <table class="ref"><thead><tr><th></th><th>Requirement</th><th>Where it is enforced</th></tr></thead><tbody>
+ <tr><td class="s">R1</td><td>Evidence traceability — every material claim grounded in a retrievable item with a stable ID</td><td class="s">step 07, 09</td></tr>
+ <tr><td class="s">R2</td><td>Policy consistency — reflect institution policy, never invent it</td><td class="s">step 07, 09</td></tr>
+ <tr><td class="s">R3</td><td>Counterfactual faithfulness — decision and rationale change coherently when key inputs change</td><td class="s">step 09</td></tr>
+ <tr><td class="s">R4</td><td>Data minimisation and access control — only the minimum necessary evidence is exposed</td><td class="s">step 07</td></tr>
+ <tr><td class="s">R5</td><td>Robustness to missing, noisy and imbalanced signals — degrade gracefully, express uncertainty</td><td class="s">step 02, 05, 09</td></tr>
+ <tr><td class="s">R6</td><td>Low hallucination risk for numbers and timelines</td><td class="s">step 06, 09</td></tr>
+ <tr><td class="s">R7</td><td>Human-in-the-loop usability — concise disposition, prioritised evidence, explicit unknowns, next steps</td><td class="s">step 09, 10</td></tr>
+ <tr><td class="s">R8</td><td>Reproducible evaluation under limited real-data access</td><td class="s">step 11</td></tr>
+ </tbody></table>`},
+
+{x:"A8",t:"Metric definitions",c:"evaluation",html:()=>`
+ <table class="ref"><thead><tr><th>Metric</th><th>Definition</th></tr></thead><tbody>
+ <tr><td class="m">Escalate P / R / F1</td><td>Precision, recall and F1 on the escalate class — the operationally critical decision</td></tr>
+ <tr><td class="m">PR-AUC</td><td>Ranking quality under the extreme class imbalance typical of alert streams</td></tr>
+ <tr><td class="m">Citation validity</td><td>Fraction of cited evidence IDs that exist in the retrieved bundle</td></tr>
+ <tr><td class="m">Evidence support</td><td>Fraction of rationale sentences whose cited item actually contains the referenced values</td></tr>
+ <tr><td class="m">Driver coverage</td><td>Top stated reasons backed by both a policy item and a case-context item</td></tr>
+ <tr><td class="m">CF-flip rate</td><td>Share of cases where a valid minimal flip condition is found within the edit budget</td></tr>
+ <tr><td class="m">CF-faithfulness</td><td>Model stops citing a removed critical item and updates its conclusion coherently</td></tr>
+ <tr><td class="m">CF-stability</td><td>Decision unchanged under irrelevant perturbations</td></tr>
+ <tr><td class="m">Numerical inconsistency</td><td>Rate of wrong amounts, totals, thresholds or ordering relative to evidence</td></tr>
+ <tr><td class="m">Policy hallucination</td><td>Rate of policy claims absent from the versioned policy corpus</td></tr>
+ <tr><td class="m">Unsupported assertion</td><td>Rate of sentences introducing entities or facts absent from all cited evidence</td></tr>
+ <tr><td class="m">Workload proxy</td><td>Share of alerts routed to monitor or escalate at a fixed recall target</td></tr>
+ </tbody></table>`},
+
+{x:"A9",t:"Data quality handling",c:"reject codes",html:()=>`
+ <p>Rows and files that fail a gate are quarantined with a code rather than coerced. A failed file gate blocks the case rather than degrading it silently.</p>
+ <table class="ref"><thead><tr><th>Level</th><th>Gate</th><th>On failure</th></tr></thead><tbody>
+ <tr><td class="s">row</td><td>Timestamp not parseable under declared pattern</td><td>Quarantine, remediation queue</td></tr>
+ <tr><td class="s">row</td><td>Amount not numeric under declared locale</td><td>Quarantine, remediation queue</td></tr>
+ <tr><td class="s">row</td><td>Account reference null or unmatched</td><td>Quarantine, remediation queue</td></tr>
+ <tr><td class="s">row</td><td>Direction not resolvable from source coding</td><td>Quarantine, remediation queue</td></tr>
+ <tr><td class="s">file</td><td>Row count differs from manifest</td><td>Block case, escalate to data owner</td></tr>
+ <tr><td class="s">file</td><td>Period coverage shorter than requested window</td><td>Block case, escalate to data owner</td></tr>
+ <tr><td class="s">file</td><td>Content hash already ingested</td><td>Skip as duplicate</td></tr>
+ <tr><td class="s">case</td><td>Quarantine rate above configured tolerance</td><td>Case flagged as incomplete; surfaced as missing evidence</td></tr>
+ </tbody></table>`},
+
+{x:"A10",t:"Known limits",c:"not covered",html:()=>`
+ <p>Stated explicitly so they are raised by us rather than discovered by a reviewer.</p>
+ <table class="ref"><thead><tr><th>Limit</th><th>Consequence</th></tr></thead><tbody>
+ <tr><td>Published results come from synthetic benchmarks</td><td>Gains may not transfer directly; our own backtest is the real test</td></tr>
+ <tr><td>Disposition taxonomies differ between institutions</td><td>The dismiss/monitor/escalate mapping must be re-specified for our label set</td></tr>
+ <tr><td>Counterfactual plausibility is hard</td><td>A minimal edit can be mathematically small but operationally unrealistic; needs investigator feedback to tune</td></tr>
+ <tr><td>Evidence-support metrics are proxies</td><td>They approximate auditability; expert review of rationales is still required</td></tr>
+ <tr><td>Retrieval can amplify historical bias</td><td>Case memory restricted to reviewed cases; retrieved precedents logged for drift monitoring</td></tr>
+ <tr><td>New attack surfaces</td><td>Prompt injection through untrusted documents, disclosure in generated text — needs input sanitisation, source whitelists, output filtering</td></tr>
+ <tr><td>Counterfactuals are diagnostics, not truth</td><td>They interrogate model behaviour; they do not prove correctness</td></tr>
+ <tr><td>Scope is triage and narrative drafting</td><td>Full case lifecycle and post-filing monitoring are out of scope for this design</td></tr>
+ <tr><td>Cost and latency</td><td>Repeated model calls for generation, repair and counterfactuals — mitigated by routing and capped budgets</td></tr>
+ </tbody></table>`},
+
+{x:"A11",t:"References",c:"3 papers",html:()=>`
+ <table class="ref"><thead><tr><th></th><th>Paper</th><th>Supplies</th></tr></thead><tbody>
+ <tr><td class="s">[P1]</td><td>Pirmorad, <i>Exploring the In-Context Learning Capabilities of LLMs for Money Laundering Detection in Financial Graphs</i>, The Vanguard Group · <span class="m">arXiv:2507.14785</span></td><td>Knowledge-graph representation, k-hop subgraph extraction, textual serialisation, few-shot typology conditioning, hybrid routing</td></tr>
+ <tr><td class="s">[P2]</td><td>Naik, Dintakurthi, Hu, Wang &amp; Qiu, <i>Co-Investigator AI: The Rise of Agentic AI for Smarter, Trustworthy AML Compliance Narratives</i> · <span class="m">arXiv:2509.08380</span></td><td>Data ingestion and structuring layer, privacy guard, crime-type detection, planning and typology agents, memory layers, judge agent, feedback loop</td></tr>
+ <tr><td class="s">[P3]</td><td>Torres, Cheng &amp; Hu, <i>Explainable AML Triage with LLMs: Evidence Retrieval and Counterfactual Checks</i> · <span class="m">arXiv:2604.19755</span></td><td>Evidence model, hybrid retrieval, output contract, verifier and repair loop, counterfactual checks, metric suite, evaluation protocol, staged rollout</td></tr>
+ </tbody></table>
+ <div class="note"><b>The finding that motivates the whole architecture.</b> In [P3]'s ablations the LLM on its own was the weakest method tested — below a gradient-boosted baseline. Placed inside this evidence-constrained, verified loop, the same model became the strongest, ahead of rules, tabular and graph baselines, while fabricated citations and numerical errors fell sharply. The value is not free-form reasoning; it is structured decision support over explicit evidence.</div>`}
+];
+
+document.getElementById('accHost').innerHTML=APPX.map((a,i)=>`
+ <div class="acc" data-a="${i}">
+   <button class="acc-h"><span class="ax">${a.x}</span><span class="at">${a.t}</span><span class="ac">${a.c}</span>
+     <svg class="av" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button>
+   <div class="acc-b">${a.html()}</div>
+ </div>`).join('');
+document.querySelectorAll('.acc-h').forEach(h=>h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
+document.querySelector('.acc').classList.add('open');
+
+/* view switch */
+document.querySelectorAll('.sg').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.sg').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  const isFlow=b.dataset.view==='flow';
+  document.getElementById('viewFlow').hidden=!isFlow;
+  document.getElementById('viewAppx').hidden=isFlow;
+  document.getElementById('walk').hidden=!isFlow;
+  if(!isFlow){if(timer){clearInterval(timer);timer=null;}phases.forEach(p=>p.classList.remove('lit','past'));close();}
+  window.scrollTo(0,0);
+}));
+</script>
+</body>
+</html>

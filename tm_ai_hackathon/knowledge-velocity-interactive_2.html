@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge Velocity — AU RT Productivity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAFAF7; --panel:#FFFFFF; --ink:#16212E; --ink-soft:#51606F;
+    --accent:#FF6200; --accent-dark:#D14E00;
+    --green:#1E8E5A; --amber:#C97F03; --red:#C9432B;
+    --line:#DDE2E6; --code-bg:#111A24; --code-ink:#D8E2EC;
+    --radius:10px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+    font-size:16px; line-height:1.55;
+  }
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  h1,h2,h3,.display{font-family:'Archivo','IBM Plex Sans',sans-serif;}
+
+  /* ---------- top bar + tabs ---------- */
+  header{
+    position:sticky; top:0; z-index:50; background:var(--paper);
+    border-bottom:2px solid var(--ink);
+  }
+  .brand{
+    display:flex; align-items:baseline; gap:12px; padding:14px 22px 8px;
+  }
+  .brand .kv{font-family:'Archivo'; font-weight:900; font-size:1.05rem; letter-spacing:.02em;}
+  .brand .kv em{color:var(--accent); font-style:normal;}
+  .brand .sub{font-family:'IBM Plex Mono'; font-size:.72rem; color:var(--ink-soft); letter-spacing:.06em; text-transform:uppercase;}
+  nav{display:flex; gap:0; overflow-x:auto; padding:0 14px;}
+  nav button{
+    appearance:none; background:none; border:none; cursor:pointer;
+    font-family:'IBM Plex Mono'; font-size:.78rem; letter-spacing:.04em;
+    padding:10px 14px 12px; color:var(--ink-soft); white-space:nowrap;
+    border-bottom:3px solid transparent; margin-bottom:-2px;
+  }
+  nav button:hover{color:var(--ink);}
+  nav button:focus-visible{outline:2px solid var(--accent); outline-offset:-2px;}
+  nav button.active{color:var(--ink); border-bottom-color:var(--accent); font-weight:500;}
+
+  main{max-width:980px; margin:0 auto; padding:34px 22px 90px;}
+  section.tab{display:none;}
+  section.tab.active{display:block; animation:fadein .25s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  @media (prefers-reduced-motion:reduce){ section.tab.active{animation:none;} *{transition:none!important;} }
+
+  /* ---------- shared ---------- */
+  .eyebrow{font-family:'IBM Plex Mono'; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-dark); margin-bottom:10px;}
+  h1{font-weight:900; font-size:clamp(1.9rem,4.5vw,3rem); line-height:1.08; letter-spacing:-.01em; margin-bottom:18px;}
+  h2{font-weight:700; font-size:1.35rem; margin:38px 0 12px;}
+  h3{font-weight:700; font-size:1.02rem; margin:22px 0 8px;}
+  p{margin-bottom:12px; max-width:70ch;}
+  p.lede{font-size:1.08rem; color:var(--ink-soft); max-width:64ch;}
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px; margin:16px 0;}
+  .panel.accent{border-left:4px solid var(--accent);}
+  .tag{display:inline-block; font-family:'IBM Plex Mono'; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; padding:2px 8px; border-radius:4px; border:1px solid var(--line); color:var(--ink-soft); margin-right:6px;}
+  .tag.orange{border-color:var(--accent); color:var(--accent-dark);}
+  .tag.green{border-color:var(--green); color:var(--green);}
+  .tag.red{border-color:var(--red); color:var(--red);}
+  .tag.amber{border-color:var(--amber); color:var(--amber);}
+  code.inline{font-family:'IBM Plex Mono'; font-size:.85em; background:#EFEFEA; padding:1px 5px; border-radius:4px;}
+  pre{
+    background:var(--code-bg); color:var(--code-ink); border-radius:var(--radius);
+    padding:16px 18px; overflow-x:auto; font-family:'IBM Plex Mono'; font-size:.8rem;
+    line-height:1.6; margin:14px 0;
+  }
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.9rem;}
+  th{font-family:'IBM Plex Mono'; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-soft); text-align:left; padding:8px 10px; border-bottom:2px solid var(--ink);}
+  td{padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
+  details{border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); margin:10px 0;}
+  details summary{
+    cursor:pointer; padding:13px 18px; font-weight:600; list-style:none;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  details summary::-webkit-details-marker{display:none;}
+  details summary::after{content:"+"; font-family:'IBM Plex Mono'; color:var(--accent); font-size:1.1rem;}
+  details[open] summary::after{content:"–";}
+  details .body{padding:0 18px 16px; border-top:1px solid var(--line); padding-top:14px;}
+  .btn{
+    appearance:none; border:2px solid var(--ink); background:var(--ink); color:#fff;
+    font-family:'IBM Plex Mono'; font-size:.8rem; letter-spacing:.05em;
+    padding:10px 18px; border-radius:6px; cursor:pointer;
+  }
+  .btn:hover{background:var(--accent); border-color:var(--accent);}
+  .btn.ghost{background:transparent; color:var(--ink);}
+  .btn.ghost:hover{color:var(--accent-dark); border-color:var(--accent);}
+  .btn:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+  .note{font-family:'IBM Plex Mono'; font-size:.72rem; color:var(--ink-soft);}
+
+  /* ---------- HOME: symptom clustering ---------- */
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin:16px 0;}
+  .chip{
+    font-size:.82rem; padding:7px 12px; border-radius:999px;
+    border:1.5px solid var(--line); background:var(--panel);
+    transition:border-color .45s, background .45s, color .45s;
+  }
+  .clustered .chip.rcA{border-color:var(--accent); background:#FFF1E8;}
+  .clustered .chip.rcB{border-color:#3B6E9C; background:#EAF2F9;}
+  .rc-cards{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px;}
+  @media (max-width:680px){.rc-cards{grid-template-columns:1fr;}}
+  .rc-card{border-radius:var(--radius); padding:18px; border:1.5px solid var(--line); background:var(--panel); opacity:.35; transition:opacity .5s;}
+  .clustered .rc-card{opacity:1;}
+  .rc-card.a{border-color:var(--accent);}
+  .rc-card.b{border-color:#3B6E9C;}
+  .rc-card h3{margin-top:0;}
+  .rc-card .status{font-family:'IBM Plex Mono'; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; margin-top:8px;}
+  .rc-card.a .status{color:var(--green);}
+  .rc-card.b .status{color:var(--ink-soft);}
+
+  /* ---------- HOME: loop ---------- */
+  .loop{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:18px 0 6px;}
+  @media (max-width:680px){.loop{grid-template-columns:1fr;}}
+  .loop-node{
+    border:1.5px solid var(--ink); border-radius:var(--radius); background:var(--panel);
+    padding:16px; cursor:pointer; text-align:left; font:inherit; color:inherit;
+    transition:transform .15s, border-color .15s;
+  }
+  .loop-node:hover{transform:translateY(-3px); border-color:var(--accent);}
+  .loop-node:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+  .loop-node .n{font-family:'IBM Plex Mono'; font-size:.68rem; color:var(--accent-dark); letter-spacing:.1em;}
+  .loop-node h3{margin:6px 0 6px;}
+  .loop-node p{font-size:.86rem; color:var(--ink-soft); margin:0;}
+  .loop-back{font-family:'IBM Plex Mono'; font-size:.72rem; color:var(--ink-soft); text-align:center; margin-top:6px;}
+
+  /* ---------- Pareto ---------- */
+  .pareto{margin:16px 0;}
+  .pareto .row{display:grid; grid-template-columns:220px 1fr 70px; gap:10px; align-items:center; margin:7px 0;}
+  @media (max-width:680px){.pareto .row{grid-template-columns:130px 1fr 60px;} .pareto .lbl{font-size:.72rem;}}
+  .pareto .lbl{font-size:.8rem;}
+  .pareto .bar{height:20px; background:#EFE6DD; border-radius:4px; overflow:hidden;}
+  .pareto .fill{height:100%; background:var(--accent); width:0; transition:width .8s ease;}
+  .pareto .row:nth-child(n+4) .fill{background:#8E9AA6;}
+  .pareto .val{font-family:'IBM Plex Mono'; font-size:.74rem; text-align:right; color:var(--ink-soft);}
+
+  /* ---------- Pre-flight demo ---------- */
+  .pf-demo{border:1.5px solid var(--ink); border-radius:var(--radius); overflow:hidden; margin:18px 0;}
+  .pf-demo .head{background:var(--ink); color:#fff; padding:10px 16px; font-family:'IBM Plex Mono'; font-size:.74rem; letter-spacing:.06em; display:flex; justify-content:space-between; align-items:center;}
+  .pf-demo .case{padding:16px 18px; font-size:.88rem; background:#FBFBF8; border-bottom:1px solid var(--line);}
+  .pf-demo .case p{margin-bottom:8px;}
+  .pf-actions{padding:14px 18px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .pf-result{padding:0 18px 18px; display:none;}
+  .pf-result.show{display:block;}
+  .light{display:inline-flex; align-items:center; gap:8px; font-family:'IBM Plex Mono'; font-size:.78rem; font-weight:500; padding:6px 12px; border-radius:6px;}
+  .light.amber{background:#FBF3E2; color:var(--amber); border:1px solid var(--amber);}
+  .gap{border-left:3px solid var(--red); background:#FCF4F2; padding:10px 14px; border-radius:0 6px 6px 0; margin:8px 0; font-size:.86rem;}
+  .gap.ok{border-left-color:var(--green); background:#F0F8F3;}
+  .gap .code{font-family:'IBM Plex Mono'; font-size:.68rem; color:var(--ink-soft); letter-spacing:.05em;}
+  .gap .cite{font-family:'IBM Plex Mono'; font-size:.7rem; color:var(--accent-dark);}
+
+  /* ---------- timeline ---------- */
+  .tl{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0;}
+  @media (max-width:760px){.tl{grid-template-columns:1fr 1fr;}}
+  .tl .blk{border:1px solid var(--line); border-top:4px solid var(--accent); border-radius:8px; background:var(--panel); padding:12px;}
+  .tl .blk .wk{font-family:'IBM Plex Mono'; font-size:.68rem; color:var(--accent-dark); letter-spacing:.08em;}
+  .tl .blk p{font-size:.82rem; margin:6px 0 0; color:var(--ink-soft);}
+
+  .footer-note{margin-top:60px; border-top:1px solid var(--line); padding-top:14px; font-family:'IBM Plex Mono'; font-size:.7rem; color:var(--ink-soft);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span class="kv">KNOWLEDGE<em>·</em>VELOCITY</span>
+    <span class="sub">AU RT Productivity — TM AI Hackathon</span>
+  </div>
+  <nav id="nav" role="tablist">
+    <button class="active" data-tab="home" role="tab">Overview</button>
+    <button data-tab="diagnose" role="tab">Layer 1 · Diagnose</button>
+    <button data-tab="intervene" role="tab">Layer 2 · Intervene</button>
+    <button data-tab="instrument" role="tab">Layer 3 · Instrument</button>
+    <button data-tab="delivery" role="tab">Delivery &amp; Risk</button>
+    <button data-tab="presentation" role="tab">Presentation Draft</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- ============================ HOME ============================ -->
+<section class="tab active" id="home">
+  <div class="eyebrow">The root cause, stated by the problem owner</div>
+  <h1>Every failure writes its own diagnosis.<br>Nobody reads it.</h1>
+  <p class="lede">AU RT's productivity problem is not a tooling gap. Expert knowledge moves at human speed — one coaching conversation, one QC comment at a time — while the transformation demands it move at organizational speed. This proposal captures the knowledge where it already leaks out, quantifies it, and redeploys it at the analyst's moment of need.</p>
+
+  <h2>Step 1 — Eleven symptoms are really two problems</h2>
+  <p>These are the pain points named in the Operations interview. Press the button to see what they reduce to.</p>
+
+  <div id="clusterZone">
+    <div class="chips">
+      <span class="chip rcA">Learning curves after accreditation</span>
+      <span class="chip rcA">High UMR→L3 escalation ratio</span>
+      <span class="chip rcA">QC repair &amp; re-submission loops</span>
+      <span class="chip rcB">SIP referral rework</span>
+      <span class="chip rcA">SME / QC bottlenecks</span>
+      <span class="chip rcA">Coaching &amp; shadowing load</span>
+      <span class="chip rcB">Manual case allocation</span>
+      <span class="chip rcB">Manual monitoring by leaders</span>
+      <span class="chip rcB">Escalation handover friction</span>
+      <span class="chip rcA">Productivity dips on transitions</span>
+      <span class="chip rcA">Constant analyst redeployment</span>
+    </div>
+    <button class="btn" id="clusterBtn">Cluster the symptoms</button>
+
+    <div class="rc-cards">
+      <div class="rc-card a">
+        <span class="tag orange">Root cause A</span>
+        <h3>The Expertise Gap</h3>
+        <p style="font-size:.88rem;">The gap between what a case requires and what the analyst currently knows — and the fact that closing knowledge lives in SME heads, transferred one conversation at a time. 7 of 11 symptoms.</p>
+        <div class="status">Status: unclaimed by any in-flight initiative → our target</div>
+      </div>
+      <div class="rc-card b">
+        <span class="tag">Root cause B</span>
+        <h3>The Visibility Gap</h3>
+        <p style="font-size:.88rem;">Operational state exists but isn't legible without manual assembly; coordination is done by hand, interventions come late. 4 of 11 symptoms.</p>
+        <div class="status">Status: partially covered by existing dashboard / QC-automation work → we feed it, not duplicate it</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel accent" style="margin-top:22px;">
+    <p style="margin:0;"><strong>Problem owner, Q2:</strong> "The challenge is not simply process adoption — it is achieving operational stability <em>while the workforce is still developing expertise.</em>" That sentence is Root Cause A, stated by the person who owns the problem.</p>
+  </div>
+
+  <details style="margin-top:14px;">
+    <summary>Coverage ledger — every symptom, dispositioned (nothing dodged)</summary>
+    <div class="body">
+      <table>
+        <tr><th>Symptom</th><th>Disposition</th></tr>
+        <tr><td>Learning curves after accreditation</td><td><span class="tag green">Direct</span> knowledge at moment of need; time-to-competency is the strategic endpoint</td></tr>
+        <tr><td>High UMR→L3 escalation ratio</td><td><span class="tag green">Direct</span> escalation gate, weeks 5–16</td></tr>
+        <tr><td>QC repair / re-submission loops</td><td><span class="tag green">Direct</span> QC pre-submission gate, weeks 17–26</td></tr>
+        <tr><td>SIP referral rework</td><td><span class="tag green">Direct</span> intake gate, weeks 17–26 — bounce-backs mined into intake codes, evidence check on inbound referrals</td></tr>
+        <tr><td>SME / QC bottlenecks</td><td><span class="tag green">Direct</span> every pre-empted error is a coaching conversation that never happens</td></tr>
+        <tr><td>Coaching / shadowing load</td><td><span class="tag amber">Indirect</span> shifts reactive→targeted via code × tenure heatmap</td></tr>
+        <tr><td>Manual case allocation</td><td><span class="tag red">Scoped out</span> needs case-mgmt write-integration + named-analyst profiling mid-redeployment — an IR conversation, not a 6-month build</td></tr>
+        <tr><td>Manual monitoring by leaders</td><td><span class="tag">Claimed (Q5)</span> we feed existing dashboards coded telemetry, duplicate nothing</td></tr>
+        <tr><td>Escalation handover friction</td><td><span class="tag amber">Consequence</span> fewer returns = fewer handovers</td></tr>
+        <tr><td>Productivity dips on transitions</td><td><span class="tag green">Direct</span> same mechanism as learning curves, per journey</td></tr>
+        <tr><td>Analyst redeployment churn</td><td><span class="tag amber">Consequence</span> frequency is a management decision; <em>cost</em> falls with time-to-competency</td></tr>
+      </table>
+      <p class="note">Pitch sentence: eleven symptoms, two root causes; we fix the unclaimed one with gates at both ends of the case; two belong to in-flight initiatives we feed; one is scoped out with a named reason; two dissolve as consequences.</p>
+    </div>
+  </details>
+
+  <h2>Step 2 — The insight</h2>
+  <p>Expert knowledge is not missing. It is <strong>written down daily and discarded</strong>. Every L3 return comment is a senior investigator teaching. Every QC repair note is a quality standard being articulated. Today each teaches one analyst, once. Reading thousands of them in aggregate used to cost analyst-weeks — LLMs drop that cost to near zero. The entire opportunity is noticing this.</p>
+
+  <h2>Step 3 — The system: three layers, one loop</h2>
+  <p>Each node opens its full technical tab. The loop is the product — the agent is one output of it.</p>
+  <div class="loop">
+    <button class="loop-node" data-goto="diagnose">
+      <span class="n">LAYER 1 · WEEKS 1–6</span>
+      <h3>Diagnose</h3>
+      <p>Mine 12 months of L3 / QC free text into a signed-off defect taxonomy. Output: a Pareto of failure causes, in FTE.</p>
+    </button>
+    <button class="loop-node" data-goto="intervene">
+      <span class="n">LAYER 2 · WEEKS 7–16</span>
+      <h3>Intervene</h3>
+      <p>The taxonomy chooses the fixes. Where the data shows recall failure: the Pre-Flight Check agent, retro-tested before go-live.</p>
+    </button>
+    <button class="loop-node" data-goto="instrument">
+      <span class="n">LAYER 3 · WEEKS 8–26</span>
+      <h3>Instrument</h3>
+      <p>Reason codes at source. Free text becomes structured data forever. Quarterly re-read closes the loop.</p>
+    </button>
+  </div>
+  <div class="loop-back">└── Layer 3 output feeds Layer 1 · the loop compounds, mining once, querying forever ──┘</div>
+
+  <h2>Step 4 — How "globally aligned" is answered</h2>
+  <p>The Pre-Flight rubric is grounded in global-standard procedures, so analysts converge on global practice as a side effect of using the tool that makes them faster — <strong>alignment without a harmonisation program, zero policy change</strong>. Phase 2 runs the same mining in a comparator jurisdiction: where AU leaks and NL doesn't marks the practices worth importing, with a measured reason attached. Harmonisation by evidence, not deference.</p>
+
+  <div class="panel">
+    <span class="tag orange">Gate action — before anything else</span>
+    <p style="margin:10px 0 0;"><strong>Sample 50 L3 return comments today (1 hour).</strong> Rich text → strong version: root cause proven from real corpus, fix retro-tested. Terse text → pivot to procedure-grounded rubric + synthetic corpus; framing survives on the interview document alone.</p>
+  </div>
+</section>
+
+<!-- ============================ DIAGNOSE ============================ -->
+<section class="tab" id="diagnose">
+  <div class="eyebrow">Layer 1 · Weeks 1–6</div>
+  <h1>Diagnose: mine the exhaust into a taxonomy</h1>
+  <p class="lede">The deliverable of this layer is not software — it is a defect taxonomy signed off by L3 and QC leads, and a Pareto of failure causes denominated in FTE. This is where anecdote dies, and it is the demo centerpiece.</p>
+
+  <h2>Pipeline</h2>
+  <pre>SOURCES                    PROCESS                          OUTPUT
+─────────                  ────────                         ───────
+L3 return comments   ──┐
+QC repair notes      ──┼─► extract 12 months ─► LLM cluster ─► candidate categories
+SIP referral bounces ──┘         │                                │
+                                 │                    2h SME adjudication workshop
+                                 │                    (L3 lead + QC lead)
+                                 ▼                                ▼
+                          back-code full history ◄── 15–25 signed-off defect codes
+                                 │
+                                 ▼
+                     attach cost per code (rework hrs, L3 min, cycle days)
+                                 │
+                                 ▼
+                     PARETO OF FAILURE CAUSES, IN FTE</pre>
+
+  <h2>Illustrative output — the Pareto</h2>
+  <p class="note">Synthetic data for structure demonstration. Real distribution comes from the AU corpus.</p>
+  <div class="pareto" id="pareto">
+    <div class="row"><span class="lbl">Source-of-funds rationale absent</span><div class="bar"><div class="fill" data-w="92"></div></div><span class="val">1.8 FTE</span></div>
+    <div class="row"><span class="lbl">Counterparty screening not evidenced</span><div class="bar"><div class="fill" data-w="70"></div></div><span class="val">1.4 FTE</span></div>
+    <div class="row"><span class="lbl">Typology mismatch vs narrative</span><div class="bar"><div class="fill" data-w="52"></div></div><span class="val">1.0 FTE</span></div>
+    <div class="row"><span class="lbl">Procedure ambiguity — threshold rule</span><div class="bar"><div class="fill" data-w="38"></div></div><span class="val">0.7 FTE</span></div>
+    <div class="row"><span class="lbl">Upstream referral data defect</span><div class="bar"><div class="fill" data-w="26"></div></div><span class="val">0.5 FTE</span></div>
+    <div class="row"><span class="lbl">All remaining codes</span><div class="bar"><div class="fill" data-w="30"></div></div><span class="val">0.6 FTE</span></div>
+  </div>
+
+  <details>
+    <summary>Clustering protocol (technical)</summary>
+    <div class="body">
+      <p><strong>Corpus prep.</strong> Export comments with case metadata: journey, case type, analyst tenure band (never named analysts at this stage), return/repair date, outcome. Strip customer PII before any LLM contact — names, account numbers, amounts bucketed.</p>
+      <p><strong>Clustering.</strong> Two-pass approach inside the tenancy ceiling: (1) per-comment classification prompt producing a short defect phrase + evidence-type label; (2) group the phrases and merge near-duplicates. Batch through Copilot Studio / AI Builder prompt actions; volume is thousands of short texts, well within limits if batched.</p>
+      <p><strong>Adjudication.</strong> Present candidate categories with 5 example comments each. SMEs merge, rename, reject. Rule: <em>every surviving code must be phrased as a checkable evidence requirement</em>, not a judgment ("SoF rationale present in narrative" — not "weak analysis").</p>
+      <p><strong>Validation.</strong> Double-code a 100-comment sample: LLM assigns codes, one SME independently assigns codes, measure agreement. Below ~80% agreement → refine code definitions and repeat. This number goes on a slide; it is what makes the taxonomy defensible when L3 disputes a flag.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Costing model — from counts to FTE</summary>
+    <div class="body">
+      <p>Per defect code: <code class="inline">frequency × unit_cost</code>, where unit cost = average rework hours (analyst) + L3 review minutes + queue days converted at loaded cost. Get unit costs from team leads as ranges, not precision theatre — present low/high bands. The Pareto in FTE is what moves leadership; counts only inform.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Why SME sign-off is non-negotiable</summary>
+    <div class="body">
+      <p>A taxonomy L3 didn't sign is a taxonomy L3 will dispute the first time the agent flags one of their patterns. The LLM does the drudgery; the SMEs supply the authority. The 2-hour workshop is the scarcest resource in the whole plan — commit it before the pitch or the timeline is fiction.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============================ INTERVENE ============================ -->
+<section class="tab" id="intervene">
+  <div class="eyebrow">Layer 2 · Weeks 7–16</div>
+  <h1>Intervene: the taxonomy chooses the fixes</h1>
+  <p class="lede">The honest part of the proposal: most defect codes will not need AI. AI's first job is telling you where AI is worth deploying — which is exactly why the one agent that is deployed can be trusted.</p>
+
+  <h2>Intervention matrix</h2>
+  <table>
+    <tr><th>Defect class</th><th>Correct intervention</th><th>AI?</th></tr>
+    <tr><td>Procedural ambiguity</td><td>Rewrite the procedure section</td><td>No</td></tr>
+    <tr><td>Training gap</td><td>Fix accreditation content</td><td>No</td></tr>
+    <tr><td>Upstream data defect</td><td>Fix intake / referral standard</td><td>No</td></tr>
+    <tr><td><strong>Genuine recall failure</strong> (evidence routinely absent)</td><td><strong>Pre-Flight Check agent</strong></td><td><strong>Yes</strong></td></tr>
+    <tr><td>System limitation</td><td>Backlog item, flagged honestly</td><td>No</td></tr>
+  </table>
+
+  <h2>The Pre-Flight Check — try it</h2>
+  <p>An analyst invokes the agent in Teams <strong>before</strong> escalating to L3 or submitting to QC. It checks whether required evidence is <em>present</em> — never whether the conclusion is right. Simulated below with a shortened synthetic case.</p>
+
+  <div class="pf-demo">
+    <div class="head"><span>PRE-FLIGHT CHECK · UMR → L3 escalation gate</span><span>case UMR-2026-0417 (synthetic)</span></div>
+    <div class="case">
+      <p><strong>Analyst narrative (excerpt):</strong> Customer received 14 inbound transfers totalling AUD 182k over 3 weeks from 9 distinct originators, inconsistent with stated salary profile. Funds moved to a newly opened account at another institution within 48h of receipt. Pattern consistent with mule activity. Recommend escalation to L3.</p>
+    </div>
+    <div class="pf-actions">
+      <button class="btn" id="pfBtn">Run Pre-Flight Check</button>
+      <span class="note">Rubric: signed-off defect codes · grounding: SharePoint procedure library</span>
+    </div>
+    <div class="pf-result" id="pfResult">
+      <span class="light amber">● HOLD — 2 evidence gaps before escalation</span>
+      <div class="gap">
+        <div class="code">CODE 01 · SOURCE-OF-FUNDS RATIONALE ABSENT</div>
+        Narrative asserts inconsistency with salary profile but does not evidence the profile itself (declared occupation, expected turnover, KYC refresh date). L3 returned <strong>34%</strong> of Q1 cases citing this gap.
+        <div class="cite">→ Procedure: TM-AU-INV-012 §4.2 "Customer profile baseline"</div>
+      </div>
+      <div class="gap">
+        <div class="code">CODE 02 · COUNTERPARTY SCREENING NOT EVIDENCED</div>
+        9 originators referenced; no record of screening outcome or internal-account linkage check in the narrative or attachments.
+        <div class="cite">→ Procedure: TM-AU-INV-012 §5.1 "Originator due diligence"</div>
+      </div>
+      <div class="gap ok">
+        <div class="code">CODE 03 · TYPOLOGY MAPPING — PRESENT</div>
+        Mule-activity typology cited and consistent with the transaction pattern described.
+      </div>
+      <p class="note" style="margin-top:10px;">Gap list + traffic light. Never a numeric score. The analyst decides — nothing is auto-approved, QC sampling continues unchanged.</p>
+    </div>
+  </div>
+
+  <details>
+    <summary>Architecture (technical)</summary>
+    <div class="body">
+      <pre>Teams (analyst) ─► Copilot Studio agent
+                       │  topic: pre-flight check
+                       │  input: case narrative (v1: analyst paste;
+                       │         v2: Power Automate pull from case mgmt if API exists)
+                       ├─► generative answers grounded on:
+                       │     SharePoint procedure library (global-standard docs)
+                       │     defect-code rubric table (Dataverse)
+                       ├─► per-code evidence-presence check (prompt action per code)
+                       └─► Dataverse log: case ref · codes flagged ·
+                           analyst action · downstream L3/QC outcome</pre>
+      <p><strong>Design rules (hard):</strong> gap list + traffic light, never scores (scores get gamed and misread as decisions). Evidence-presence checks, never conclusion checks (kills the gaming vector and keeps Model Risk classification low). Human always decides.</p>
+      <p><strong>Integration honesty:</strong> if case management exposes nothing Power Automate can touch, v1 is analyst-initiated paste. Ugly, ships, pilots fine at 10 analysts — stated openly rather than hand-waving an unconfirmed integration.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>The second gate — SIP→UMR intake (weeks 17–26, committed)</summary>
+    <div class="body">
+      <p>The same machinery pointed at the other end of the case. SIP referral bounce-backs are another free-text exhaust stream: mine them with the identical pipeline into <strong>intake defect codes</strong>, then run an evidence-presence check on inbound referrals <em>before</em> they consume an investigator — deficient ones bounce with a specific gap list instead of entering the queue and generating rework.</p>
+      <p>Marginal cost is near zero: the clustering pipeline, agent pattern, Dataverse schema, and adjudication protocol are all built by week 16; the intake gate is a second rubric configuration. Result: <strong>bad work stopped entering and stopped leaving</strong> — one taxonomy method, two gates, both ends of the case.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Retro-test protocol — the backtest before go-live</summary>
+    <div class="body">
+      <p>Take 40–50 cases L3 <em>actually returned</em> last quarter plus a control set of accepted cases. Run the rubric against the pre-escalation narratives. Report: hit rate (did the gate flag the real return reason?) and false-positive rate on the control set. This converts the pitch from "here's a chatbot" to "here's measured performance against historical ground truth" — and it pre-answers Model Risk. Run it even if the agent build is half-finished at demo time; the numbers are the demo.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Copilot Studio constraints to budget for</summary>
+    <div class="body">
+      <p>Grounding-size limits on SharePoint sources (chunk the procedure library, one doc per code family). Generative-answer variance (pin the rubric checks to prompt actions with structured output, keep free generation only for citations). AI Builder credit consumption at pilot volume — budget credits explicitly in the proposal; a pilot that dies on licensing in month four is an avoidable embarrassment.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ============================ INSTRUMENT ============================ -->
+<section class="tab" id="instrument">
+  <div class="eyebrow">Layer 3 · Weeks 8–26 (overlapping)</div>
+  <h1>Instrument: close the loop at source</h1>
+  <p class="lede">The first pass is a mining exercise. Every pass after is a query — because the process now records its own failure reasons in structured form, at the moment they occur, at a cost of two seconds per analyst.</p>
+
+  <h2>The two-second change</h2>
+  <div class="panel">
+    <p style="margin:0;">Add a <strong>reason-code dropdown</strong> (the signed-off taxonomy) at exactly two points: the L3 return action and the QC repair action. Free text stays available for nuance; the code is mandatory. If the case-management UI owner can't slot the change, a SharePoint form intercepting the same workflow step is the workaround — name the owner, don't hand-wave.</p>
+  </div>
+
+  <h2>Data model</h2>
+  <pre>Dataverse table: defect_events
+────────────────────────────────
+event_id          guid
+case_ref          string        (case identifier, no customer PII)
+journey           choice        UMR | SAF | Fraud UMR
+gate              choice        L3_return | QC_repair | preflight_flag
+defect_code       lookup        → taxonomy table (15–25 codes, versioned)
+analyst_tenure    choice        ramp-up | established | senior   (band, not name)
+preflight_used    bool
+outcome           choice        accepted | returned | repaired
+created_on        datetime</pre>
+  <p class="note">Tenure recorded as band, not identity — the coaching signal works at cohort level and avoids the individual-performance-profiling conversation entirely during a redeployment program.</p>
+
+  <h2>What the loop yields quarterly</h2>
+  <table>
+    <tr><th>Question</th><th>Answered by</th></tr>
+    <tr><td>Did the procedure rewrite work?</td><td>Code frequency shrinks after intervention date</td></tr>
+    <tr><td>Is the agent earning its keep?</td><td>Return rate: preflight-used vs not, same code, same tenure band</td></tr>
+    <tr><td>Where should coaching go?</td><td>Code × tenure-band heatmap (the Q9 leaders' ask, free)</td></tr>
+    <tr><td>What's newly breaking?</td><td>New codes surfacing in free-text overflow</td></tr>
+  </table>
+
+  <div class="panel accent">
+    <p style="margin:0;"><strong>Relationship to the "operational intelligence" vision:</strong> code frequencies stream into the <em>existing</em> dashboard workstream. We feed the platform the problem owner dreams of (Q11) without committing the sin he warns against (Q10, no platform builds). That is the entire integration posture: emit telemetry, duplicate nothing.</p>
+  </div>
+</section>
+
+<!-- ============================ DELIVERY ============================ -->
+<section class="tab" id="delivery">
+  <div class="eyebrow">Six months · one journey · one measured result</div>
+  <h1>Delivery, measurement, risk</h1>
+
+  <h2>Timeline</h2>
+  <div class="tl">
+    <div class="blk"><span class="wk">WEEKS 1–4</span><p>Corpus extraction · clustering · taxonomy v1 · SME sign-off · Model Risk engagement booked</p></div>
+    <div class="blk"><span class="wk">WEEKS 5–8</span><p>Rubric per code · procedure grounding library · agent build · reason-code dropdown live</p></div>
+    <div class="blk"><span class="wk">WEEKS 9–16</span><p>Pilot + baseline · retro-test published · rubric iteration against observed misses</p></div>
+    <div class="blk"><span class="wk">WEEKS 17–26</span><p>Second gate: SIP→UMR intake (referral bounce-backs → intake codes) · QC pre-submission gate · SAF config · Fraud UMR prep</p></div>
+  </div>
+  <p class="note">Scope discipline: one journey, one taxonomy, gates at both ends of the case — escalation gate measured by week 16, intake gate live by week 26. Cross-jurisdiction comparison and group rollout are phase 2 — vision, never committed scope.</p>
+
+  <h2>Measurement design</h2>
+  <table>
+    <tr><th>Element</th><th>Detail</th></tr>
+    <tr><td>Baseline (week 1)</td><td>L3 return rate · QC first-pass yield · rework hours/case</td></tr>
+    <tr><td>Pilot</td><td>~10 UMR analysts vs matched control pod · 6–8 weeks</td></tr>
+    <tr><td>Primary endpoint</td><td>L3 return rate</td></tr>
+    <tr><td>Secondary</td><td>QC first-pass yield</td></tr>
+    <tr><td>Strategic</td><td>Time-to-competency for newly accredited analysts</td></tr>
+    <tr><td><strong>Design rule</strong></td><td><strong>Stratify by tenure band</strong> — effect is large in the ramp-up cohort, near zero for seniors; an unstratified average looks weak and kills the project</td></tr>
+  </table>
+
+  <h2>Risks, pre-conceded</h2>
+  <details><summary><span class="tag red">R1</span> Corpus too terse</summary><div class="body"><p>If returns say "insufficient evidence" and stop, the taxonomy is 4 codes and dead. <strong>Gate: sample 50 comments before committing (1 hour).</strong> Fallback: synthetic corpus labeled as methodology demonstration, hit-rate claims removed; framing survives on the interview document alone.</p></div></details>
+  <details><summary><span class="tag amber">R2</span> Gaming the checker</summary><div class="body"><p>Analysts optimize to satisfy the gate rather than investigate. Mitigated structurally: rubric checks evidence presence not conclusions; QC sampling continues unchanged; nothing auto-approved.</p></div></details>
+  <details><summary><span class="tag amber">R3</span> Model Risk classification</summary><div class="body"><p>Decision-support, human decision-maker, no customer impact, no regulator-facing artifact generated → should classify low-tier, but ING's framework decides, not us. Engagement booked week 2, on the slide — costs nothing, signals shipping experience.</p></div></details>
+  <details><summary><span class="tag amber">R4</span> Copilot Studio limits</summary><div class="body"><p>Grounding size, generative variance, AI Builder credit burn at volume. Credits budgeted explicitly; structured prompt actions over free generation for the rubric checks.</p></div></details>
+  <details><summary><span class="tag red">R5</span> SME attention</summary><div class="body"><p>The true scarce resource: 2 hours of the L3 lead. Committed <strong>before</strong> the pitch, or the timeline is fiction.</p></div></details>
+  <details><summary><span class="tag amber">R6</span> Case content reaching the agent</summary><div class="body"><p>If case management exposes no automatable surface, v1 is analyst paste. Ugly, ships, pilots fine at 10 analysts. Stated openly.</p></div></details>
+
+  <h2>Constraint compliance (judges will hold the owner's doc)</h2>
+  <table>
+    <tr><th>Owner constraint</th><th>How met</th></tr>
+    <tr><td>Existing tools only (Q10)</td><td>Copilot Studio · Power Automate · Dataverse · SharePoint — all in-tenancy</td></tr>
+    <tr><td>Complements in-flight work (Q5)</td><td>Feeds coded data into existing dashboards; duplicates nothing</td></tr>
+    <tr><td>Stability over speed (Q8)</td><td>Single journey pilot before any extension</td></tr>
+    <tr><td>Data-driven governance (Q6)</td><td>The taxonomy + loop is that sentence, operationalized</td></tr>
+    <tr><td>Leader coaching insight (Q9)</td><td>Code × tenure heatmap, free from the Dataverse log</td></tr>
+    <tr><td>Scales SAF / UMR / Fraud UMR (Q10)</td><td>Gate is generic; rubric is per-journey config</td></tr>
+  </table>
+
+  <h2>Pitch arc — five beats</h2>
+  <table>
+    <tr><td class="mono">1</td><td><strong>Every failure writes its own diagnosis, and nobody reads it.</strong> Open on the owner's Q2 sentence.</td></tr>
+    <tr><td class="mono">2</td><td><strong>We read twelve months of it.</strong> The real Pareto, in FTE, on screen.</td></tr>
+    <tr><td class="mono">3</td><td><strong>The data chose the interventions.</strong> Most weren't AI — which is why you can trust the one that was.</td></tr>
+    <tr><td class="mono">4</td><td><strong>The Pre-Flight Check, retro-tested</strong> against last quarter's real L3 returns. Hit rate on screen.</td></tr>
+    <tr><td class="mono">5</td><td><strong>The loop runs itself, and the method ships to every jurisdiction.</strong> AU's problem becomes ING's capability.</td></tr>
+  </table>
+
+  <div class="footer-note">Knowledge Velocity · TM AI Hackathon proposal · synthetic data throughout marked as illustrative · gate action: sample 50 L3 return comments before committing.</div>
+</section>
+
+<!-- ============================ PRESENTATION DRAFT ============================ -->
+<section class="tab" id="presentation">
+  <div class="eyebrow">Slide-by-slide skeleton — content ready to lift into the deck</div>
+  <h1>Presentation draft</h1>
+  <p class="lede">Seven blocks in presentation order. Each block is one slide (or two at most). Synthetic figures are placeholders — replace with real corpus numbers after the 50-comment check.</p>
+
+  <div class="panel accent">
+    <span class="tag orange">Slide 1 · Executive summary</span>
+    <h3 style="margin-top:10px;">Knowledge Velocity — fixing AU RT productivity at its root cause</h3>
+    <p><strong>Root cause:</strong> expert knowledge in AU RT transfers at human speed — one coaching conversation, one QC comment at a time — while the transformation demands organizational speed. Every major symptom (learning curves, escalation ratios, QC rework, SME bottlenecks) is this one mismatch.</p>
+    <p><strong>Fix:</strong> mine 12 months of L3/QC free-text into a signed-off defect taxonomy (the diagnosis), deploy an evidence-presence gate at both ends of the case (the treatment), instrument reason codes at source (the loop). A lesson that today teaches one analyst once pre-empts the same error for the whole floor.</p>
+    <p style="margin-bottom:0;"><strong>Ask:</strong> 2 hours of L3-lead adjudication time, read access to 12 months of return/repair comments, one pilot pod of ~10 UMR analysts. All tooling in-tenancy. 6 months to a measured result.</p>
+  </div>
+
+  <div class="panel">
+    <span class="tag">Slide 2 · Structure of the idea</span>
+    <pre style="margin-top:12px;">          ┌──────────────────────────────────────────────┐
+          │                                              │
+          ▼                                              │
+  L1 DIAGNOSE          L2 INTERVENE           L3 INSTRUMENT
+  free-text exhaust    taxonomy chooses       reason codes
+  → defect taxonomy    the fixes; gates at    at source →
+  → Pareto in FTE      both ends of case      structured forever
+          │                    │                     │
+          └── evidence ────────┴──── telemetry ──────┘
+                    (feeds existing dashboards)</pre>
+    <p style="margin-bottom:0;">One loop, three layers. The agent is one output of the loop, not the product. The loop is what compounds: first pass is a mining exercise, every later pass is a query.</p>
+  </div>
+
+  <div class="panel">
+    <span class="tag">Slide 3 · The tool / agent</span>
+    <h3 style="margin-top:10px;">Pre-Flight Check — Copilot Studio agent in Teams</h3>
+    <table>
+      <tr><td style="width:32%;"><strong>Invocation</strong></td><td>Analyst-triggered, before L3 escalation / QC submission / (phase 2) on SIP referral intake</td></tr>
+      <tr><td><strong>Check type</strong></td><td>Evidence-<em>presence</em> per defect code — never conclusion correctness</td></tr>
+      <tr><td><strong>Output</strong></td><td>Gap list + traffic light + procedure citations. Never a numeric score. Human always decides</td></tr>
+      <tr><td><strong>Grounding</strong></td><td>SharePoint procedure library (global-standard docs) + defect-code rubric (Dataverse)</td></tr>
+      <tr><td><strong>Validation</strong></td><td>Retro-test: hit rate against 40–50 real L3-returned cases + false-positive rate on accepted controls</td></tr>
+      <tr><td><strong>Logging</strong></td><td>Every check → Dataverse: case ref, codes flagged, analyst action, downstream outcome</td></tr>
+    </table>
+  </div>
+
+  <div class="panel">
+    <span class="tag">Slide 4 · Inputs required</span>
+    <table>
+      <tr><th>Input</th><th>Source / owner</th><th>Volume &amp; form</th></tr>
+      <tr><td><strong>L3 return comments</strong></td><td>Case management export · L3 team lead</td><td>12 months, free text + case metadata (journey, case type, dates, outcome)</td></tr>
+      <tr><td><strong>QC defect / repair notes</strong></td><td>QC tracking (SharePoint) · QC lead</td><td>12 months, free text</td></tr>
+      <tr><td><strong>SIP referral bounce-backs</strong></td><td>SIP↔UMR handover records</td><td>12 months (phase: intake gate, weeks 17–26)</td></tr>
+      <tr><td><strong>Procedure library</strong></td><td>Global-standard investigation procedures · process owner</td><td>Current versions, SharePoint, chunkable per defect-code family</td></tr>
+      <tr><td><strong>Unit-cost estimates</strong></td><td>Team leads</td><td>Rework hrs, L3 review min, cycle days — as ranges, not precision theatre</td></tr>
+      <tr><td><strong>SME time</strong></td><td>L3 lead + QC lead</td><td>2h adjudication workshop + ~1h validation double-coding</td></tr>
+      <tr><td><strong>Pilot capacity</strong></td><td>Operations</td><td>~10 UMR analysts + matched control pod, 6–8 weeks</td></tr>
+      <tr><td><strong>Platform access</strong></td><td>IT / Power Platform admin</td><td>Copilot Studio env, Dataverse, Power Automate, AI Builder credits (budgeted)</td></tr>
+      <tr><td><strong>Approvals</strong></td><td>Model Risk (engagement wk 2) · data access for PII-stripped comment export</td><td>Booked early, on the plan</td></tr>
+    </table>
+    <p class="note" style="margin-bottom:0;">PII rule: customer names/accounts stripped and amounts bucketed before any LLM contact; analyst identity reduced to tenure band.</p>
+  </div>
+
+  <div class="panel">
+    <span class="tag">Slide 5 · The AI layer</span>
+    <table>
+      <tr><th>Function</th><th>AI component</th><th>Guardrail</th></tr>
+      <tr><td>Cluster 12 months of free text into candidate defect categories</td><td>LLM classification via Copilot Studio / AI Builder prompt actions, batched</td><td>SME adjudication converts candidates into the signed taxonomy — AI proposes, humans authorize</td></tr>
+      <tr><td>Back-code full history</td><td>Per-comment code assignment against signed taxonomy</td><td>Double-coded 100-sample vs SME; ≥80% agreement required before results are used</td></tr>
+      <tr><td>Runtime evidence-presence checks</td><td>One structured prompt action per defect code</td><td>Structured output, not free generation; checks presence, never judgment</td></tr>
+      <tr><td>Procedure citations</td><td>Generative answers grounded on SharePoint library</td><td>Citation-only role; the gap finding itself comes from the structured check</td></tr>
+    </table>
+    <p style="margin-bottom:0;"><strong>The honest line:</strong> most defect codes won't need AI at all — they'll need procedure rewrites and training fixes. AI's first job here is telling you where AI is worth deploying. That is why the one agent that ships can be trusted.</p>
+  </div>
+
+  <div class="panel">
+    <span class="tag">Slide 6 · Outputs</span>
+    <table>
+      <tr><th>Output</th><th>Consumer</th><th>When</th></tr>
+      <tr><td>Signed-off defect taxonomy (15–25 codes)</td><td>L3, QC, training, procedure owners</td><td>Week 4</td></tr>
+      <tr><td>Pareto of failure causes in FTE</td><td>Leadership — anecdote dies here</td><td>Week 6</td></tr>
+      <tr><td>Intervention plan per code (most non-AI)</td><td>Process / training owners</td><td>Week 6</td></tr>
+      <tr><td>Pre-Flight Check agent + retro-test report</td><td>Analysts · Model Risk</td><td>Weeks 8 / 12</td></tr>
+      <tr><td>Reason-code instrumentation (structured data forever)</td><td>The loop itself + existing dashboards</td><td>Week 8</td></tr>
+      <tr><td>Code × tenure coaching heatmap</td><td>Team leaders (the Q9 ask, free)</td><td>From week 10</td></tr>
+      <tr><td>Pilot results, tenure-stratified</td><td>Go/no-go for SAF + Fraud UMR extension</td><td>Week 16</td></tr>
+      <tr><td>Intake gate on SIP referrals</td><td>UMR queue hygiene</td><td>Week 26</td></tr>
+    </table>
+  </div>
+
+  <div class="panel">
+    <span class="tag">Slide 7 · Business benefits</span>
+    <table>
+      <tr><th>Benefit</th><th>Mechanism</th><th>Measured by</th></tr>
+      <tr><td>Fewer L3 returns → senior capacity recovered</td><td>Gaps caught pre-escalation</td><td>L3 return rate (primary endpoint), pilot vs control</td></tr>
+      <tr><td>Higher QC first-pass yield → rework hours eliminated</td><td>Same rubric at QC submission</td><td>First-pass yield (secondary endpoint)</td></tr>
+      <tr><td>Faster time-to-competency → transformation de-risked</td><td>Every past lesson delivered at moment of need</td><td>Ramp-up cohort competency curve, tenure-stratified</td></tr>
+      <tr><td>SME/QC bottleneck relief</td><td>Pre-empted errors = coaching conversations that never happen</td><td>Coaching/repair hours per case</td></tr>
+      <tr><td>Global alignment as a side effect</td><td>Rubric grounded in global-standard procedures — analysts converge by using the tool that makes them faster</td><td>Zero policy change required</td></tr>
+      <tr><td>Evidence-based governance, permanent</td><td>Reason codes at source; quarterly distribution re-read</td><td>Cost of each future diagnosis: a query, not a project</td></tr>
+      <tr><td>Group-wide export potential</td><td>Method is journey-agnostic — any process that writes failure text can be mined</td><td>Phase 2: comparator jurisdiction, then 35+ entities</td></tr>
+    </table>
+    <p class="note" style="margin-bottom:0;">Quantification discipline: no benefit number appears on a slide without the Pareto behind it. The FTE figures come from the real corpus (week 6), not from optimism.</p>
+  </div>
+
+  <div class="panel">
+    <span class="tag orange">Closing beat</span>
+    <p style="margin:10px 0 0;">The assigned "problem" jurisdiction becomes the origin of a group-wide diagnostic capability: AU builds the loop during its transformation and ships the method to every entity. AU RT's productivity problem becomes ING's capability.</p>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  // tabs
+  var nav = document.getElementById('nav');
+  var tabs = document.querySelectorAll('section.tab');
+  function go(id){
+    nav.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b.dataset.tab===id); });
+    tabs.forEach(function(t){ t.classList.toggle('active', t.id===id); });
+    window.scrollTo({top:0, behavior:'auto'});
+    if(id==='diagnose'){ animatePareto(); }
+  }
+  nav.addEventListener('click', function(e){
+    var b = e.target.closest('button[data-tab]');
+    if(b) go(b.dataset.tab);
+  });
+  document.querySelectorAll('[data-goto]').forEach(function(n){
+    n.addEventListener('click', function(){ go(n.dataset.goto); });
+  });
+
+  // symptom clustering
+  var clusterBtn = document.getElementById('clusterBtn');
+  var zone = document.getElementById('clusterZone');
+  clusterBtn.addEventListener('click', function(){
+    var on = zone.classList.toggle('clustered');
+    clusterBtn.textContent = on ? 'Reset' : 'Cluster the symptoms';
+  });
+
+  // pareto animation
+  var paretoAnimated = false;
+  function animatePareto(){
+    if(paretoAnimated) return;
+    paretoAnimated = true;
+    document.querySelectorAll('#pareto .fill').forEach(function(f){
+      requestAnimationFrame(function(){ f.style.width = f.dataset.w + '%'; });
+    });
+  }
+
+  // pre-flight demo
+  var pfBtn = document.getElementById('pfBtn');
+  var pfResult = document.getElementById('pfResult');
+  pfBtn.addEventListener('click', function(){
+    pfBtn.disabled = true;
+    pfBtn.textContent = 'Checking against 3 rubric codes…';
+    setTimeout(function(){
+      pfResult.classList.add('show');
+      pfBtn.textContent = 'Re-run check';
+      pfBtn.disabled = false;
+    }, 900);
+  });
+})();
+</script>
+</body>
+</html>

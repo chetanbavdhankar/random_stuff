@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic TM Investigator — Methodology</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0F141A;--ink-2:#2A333E;--muted:#5E6976;--faint:#8A94A0;
+    --paper:#E9ECEF;--panel:#FFFFFF;--panel-2:#F5F7F9;--line:#D2D8DE;--line-2:#E6EAEE;
+    --teal:#0B6E75;--teal-deep:#08525A;--teal-wash:#E4F0F0;
+    --amber:#B5730F;--amber-wash:#F7EEDD;
+    --risk:#B23A2E;--risk-wash:#F6E6E3;--safe:#2C7A54;--safe-wash:#E4F1EA;
+    --navy:#16233B;--cyan:#3FB6C0;
+    --shadow:0 1px 2px rgba(16,24,32,.05),0 10px 26px -14px rgba(16,24,32,.16);
+    --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+    --sans:'IBM Plex Sans',system-ui,sans-serif;--disp:'Space Grotesk','IBM Plex Sans',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--teal);color:#fff}
+  a{color:var(--teal-deep)}
+
+  header.masthead{position:sticky;top:0;z-index:40;background:var(--navy);color:#EAF0F4;border-bottom:1px solid #0A1220}
+  .mast-inner{max-width:1140px;margin:0 auto;padding:0 22px}
+  .mast-top{display:flex;align-items:center;gap:14px;padding:15px 0 13px}
+  .glyph{width:34px;height:34px;flex:0 0 auto;border:1.5px solid #3C5170;border-radius:8px;display:grid;place-items:center;background:#0E1A2E}
+  .glyph span{width:7px;height:7px;background:var(--cyan);border-radius:50%;box-shadow:0 0 0 3px rgba(63,182,192,.2)}
+  .wordmark b{font-family:var(--disp);font-weight:700;font-size:16px;color:#fff;display:block;line-height:1.15}
+  .wordmark small{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8FA6BE}
+  .mast-meta{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#7E96AE;text-align:right;line-height:1.6}
+  nav.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  .tab-btn{appearance:none;background:none;border:none;cursor:pointer;font-family:var(--mono);font-size:12px;color:#93A8BE;padding:11px 15px 13px;border-bottom:2px solid transparent;white-space:nowrap;display:flex;gap:8px;align-items:center;transition:color .16s}
+  .tab-btn .idx{font-size:10px;color:#5E7590}
+  .tab-btn:hover{color:#DCE8F0}
+  .tab-btn.active{color:#fff;border-bottom-color:var(--cyan)}
+  .tab-btn.active .idx{color:var(--cyan)}
+  .tab-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:-2px;border-radius:3px}
+
+  main{max-width:1140px;margin:0 auto;padding:30px 22px 80px}
+  .panel[hidden]{display:none}
+  .panel{animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin:0 0 9px}
+  h1.big{font-family:var(--disp);font-weight:700;font-size:clamp(24px,3.1vw,33px);line-height:1.1;letter-spacing:-.02em;margin:0 0 10px}
+  .lede{font-size:15.5px;color:var(--ink-2);max-width:74ch;margin:0 0 10px}
+  h2.sec{font-family:var(--disp);font-weight:600;font-size:19px;margin:34px 0 4px;display:flex;align-items:baseline;gap:10px}
+  h2.sec .n{font-family:var(--mono);font-size:12px;color:var(--teal)}
+  h3.sub{font-family:var(--disp);font-weight:600;font-size:15px;margin:20px 0 6px}
+  .cap{color:var(--muted);font-size:13.5px;max-width:76ch;margin:4px 0 16px}
+  p{margin:0 0 11px}
+  .mono{font-family:var(--mono)}
+  .kicker{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:9px}
+
+  .grid{display:grid;gap:13px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:840px){.g2,.g3{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:17px 18px;box-shadow:var(--shadow)}
+  .card h4{font-family:var(--disp);font-weight:600;font-size:14.5px;margin:0 0 7px}
+  .card p{font-size:13px;color:var(--ink-2);margin:0 0 8px}
+  .card p:last-child{margin:0}
+
+  .tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;padding:2px 7px;border-radius:5px;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);white-space:nowrap}
+  .tag.teal{color:var(--teal-deep);border-color:#AFD3D4;background:var(--teal-wash)}
+  .tag.risk{color:var(--risk);border-color:#E3B7B0;background:var(--risk-wash)}
+  .tag.safe{color:var(--safe);border-color:#AED4BF;background:var(--safe-wash)}
+  .tag.amber{color:var(--amber);border-color:#E4CFA3;background:var(--amber-wash)}
+  .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+  .dot.teal{background:var(--teal)}.dot.amber{background:var(--amber)}.dot.risk{background:var(--risk)}.dot.safe{background:var(--safe)}
+  .pref{font-family:var(--mono);font-size:10.5px;color:var(--teal-deep);background:var(--teal-wash);border:1px solid #B7D6D7;border-radius:4px;padding:0 5px;white-space:nowrap}
+
+  .code{background:#0E1A26;border-radius:10px;border:1px solid #17232F;overflow:hidden;margin:10px 0}
+  .code-bar{display:flex;align-items:center;gap:8px;padding:8px 13px;background:#0A141E;border-bottom:1px solid #182634;font-family:var(--mono);font-size:10.5px;color:#9FE0E6;letter-spacing:.05em}
+  .code pre{margin:0;padding:13px 15px;overflow-x:auto;font-family:var(--mono);font-size:11.8px;line-height:1.62;color:#CDD9E1}
+  .c-key{color:#7FD4DB}.c-str{color:#E3C08A}.c-num{color:#8DD2A0}.c-com{color:#5E7488;font-style:italic}.c-punc{color:#69829a}.c-bool{color:#D89CC4}.c-tok{color:#D89CC4}
+
+  table.data{width:100%;border-collapse:collapse;font-size:12.8px;margin:8px 0}
+  table.data th{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);text-align:left;font-weight:500;padding:8px 10px;border-bottom:1px solid var(--line)}
+  table.data td{padding:8px 10px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  table.data tr:last-child td{border-bottom:none}
+  table.data td.m{font-family:var(--mono);font-size:11.5px;white-space:nowrap;color:var(--teal-deep)}
+
+  /* stepper */
+  .pipe{display:grid;grid-template-columns:288px 1fr;gap:22px;margin-top:8px}
+  @media(max-width:880px){.pipe{grid-template-columns:1fr}}
+  .steps{display:flex;flex-direction:column;position:relative}
+  .steps::before{content:"";position:absolute;left:19px;top:24px;bottom:24px;width:2px;background:var(--line)}
+  .step{display:flex;gap:13px;align-items:flex-start;padding:9px 10px;border-radius:9px;cursor:pointer;border:1px solid transparent;background:none;text-align:left;font-family:inherit;width:100%;transition:background .15s}
+  .step:hover{background:var(--panel)}
+  .step.active{background:var(--panel);border-color:var(--line);box-shadow:var(--shadow)}
+  .step .num{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:var(--paper);border:2px solid var(--line);color:var(--muted);font-family:var(--mono);font-size:10px;font-weight:600;display:grid;place-items:center;z-index:1;margin-top:1px}
+  .step.active .num,.step.done .num{background:var(--teal);border-color:var(--teal);color:#fff}
+  .step .st-t{font-family:var(--disp);font-weight:600;font-size:13px;line-height:1.25;color:var(--ink)}
+  .step .st-d{font-size:11px;color:var(--muted);margin-top:2px;font-family:var(--mono)}
+  .step:focus-visible{outline:2px solid var(--teal);outline-offset:1px}
+  .stage-detail{min-width:0}
+  .io{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:13px 0}
+  @media(max-width:620px){.io{grid-template-columns:1fr}}
+  .io .box{background:var(--panel-2);border:1px solid var(--line-2);border-radius:9px;padding:12px 13px}
+  .io ul{margin:0;padding-left:16px;font-size:12.6px;color:var(--ink-2)}
+  .io ul li{margin-bottom:4px}
+  .ground{border-left:3px solid var(--amber);background:var(--amber-wash);padding:10px 14px;border-radius:0 8px 8px 0;font-size:12.8px;color:#7A5410;margin:13px 0 0}
+  .ground b{color:#6B4A0E}
+  .detail-body{font-size:13.4px;color:var(--ink-2)}
+  .detail-body p{margin:0 0 10px}
+  .detail-body b{color:var(--ink)}
+
+  /* typology grid */
+  .typo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin:10px 0}
+  @media(max-width:840px){.typo-grid{grid-template-columns:repeat(2,1fr)}}
+  .typo{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 12px 10px;text-align:center;box-shadow:var(--shadow)}
+  .typo svg{width:100%;height:74px;display:block}
+  .typo .tn{font-family:var(--disp);font-weight:600;font-size:12.5px;margin-top:6px}
+  .typo .td{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .tnode{fill:#16294A;stroke:#31507E;stroke-width:1.2}
+  .tnode.hot{fill:var(--teal);stroke:var(--teal-deep)}
+  .tedge{stroke:#7FB2B8;stroke-width:1.3;fill:none;marker-end:url(#ta)}
+
+  .flowband{display:flex;align-items:stretch;flex-wrap:wrap;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel);margin:12px 0}
+  .flowband .fb{flex:1;min-width:150px;padding:13px 14px;border-right:1px solid var(--line-2)}
+  .flowband .fb:last-child{border-right:none}
+  .flowband .fb .fk{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:5px}
+  .flowband .fb .ft{font-family:var(--disp);font-weight:600;font-size:13px;margin-bottom:4px}
+  .flowband .fb p{font-size:11.8px;color:var(--muted);margin:0}
+  .flowband .fb.det .fk{color:var(--teal)}.flowband .fb.prob .fk{color:var(--amber)}
+
+  .callout{display:flex;gap:12px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:9px;padding:13px 15px;margin:14px 0}
+  .callout p{margin:0;font-size:13px;color:var(--ink-2)}
+  .callout b{color:var(--ink)}
+
+  .paper{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:17px 18px;box-shadow:var(--shadow)}
+  .paper .pid{font-family:var(--mono);font-size:10.5px;color:var(--teal-deep);background:var(--teal-wash);border:1px solid #B7D6D7;border-radius:5px;padding:1px 7px;display:inline-block;margin-bottom:8px}
+  .paper h4{font-family:var(--disp);font-weight:600;font-size:14.5px;margin:0 0 5px;line-height:1.3}
+  .paper .src{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-bottom:9px;word-break:break-all}
+  .paper p{font-size:12.8px;color:var(--ink-2);margin:0 0 8px}
+  .paper ul{margin:0;padding-left:16px;font-size:12.6px;color:var(--ink-2)}
+  .paper ul li{margin-bottom:4px}
+
+  .foot{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);font-family:var(--mono);font-size:11px;color:var(--faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<marker id="ta" markerWidth="7" markerHeight="7" refX="5.5" refY="2.5" orient="auto"><path d="M0,0 L5.5,2.5 L0,5 Z" fill="#7FB2B8"/></marker>
+</defs></svg>
+
+<header class="masthead">
+  <div class="mast-inner">
+    <div class="mast-top">
+      <div class="glyph"><span></span></div>
+      <div class="wordmark"><b>SENTINEL / TM Investigator</b><small>Detailed Methodology · Paper-Grounded</small></div>
+      <div class="mast-meta"><div>All examples use structural placeholders</div><div>No fabricated case data</div></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab-btn active" role="tab" data-tab="found"><span class="idx">01</span> Research Foundations</button>
+      <button class="tab-btn" role="tab" data-tab="data"><span class="idx">02</span> Data Methodology D0–D7</button>
+      <button class="tab-btn" role="tab" data-tab="agent"><span class="idx">03</span> Agent &amp; Verification</button>
+      <button class="tab-btn" role="tab" data-tab="eval"><span class="idx">04</span> Evaluation &amp; Rollout</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 01 FOUNDATIONS ============ -->
+<section class="panel" id="tab-found" role="tabpanel">
+  <p class="eyebrow">What the methodology is built on</p>
+  <h1 class="big">Three published methods, one investigation system.</h1>
+  <p class="lede">Each component of this design is taken from a peer-reviewed or preprint method that has been tested on public AML benchmarks — not invented for this deck. The three papers below respectively supply the <b>graph representation</b>, the <b>agentic architecture</b>, and the <b>evidence &amp; verification discipline</b>.</p>
+
+  <div class="grid g3" style="margin-top:14px">
+    <div class="paper">
+      <span class="pid">[P1]</span>
+      <h4>In-Context Learning of LLMs for Money Laundering Detection in Financial Graphs</h4>
+      <div class="src">Pirmorad (Vanguard) · arXiv:2507.14785</div>
+      <p>Shows that an LLM can perform investigator-style reasoning when transactions are represented as a <b>financial knowledge graph</b> and each case is presented as a <b>k-hop subgraph serialized to structured text</b>, conditioned by few-shot examples of canonical laundering topologies.</p>
+      <ul>
+        <li>Edge-centric framing: the alerted transaction is the anchor</li>
+        <li>Serialization preserves topology, direction, timestamps, values</li>
+        <li>Eight canonical patterns as reasoning demonstrations</li>
+        <li>Finding: LLM reasoning is strongest on structured patterns; recommends hybrid triage (light classifier first, LLM for borderline cases)</li>
+      </ul>
+    </div>
+    <div class="paper">
+      <span class="pid">[P2]</span>
+      <h4>Co-Investigator AI: Agentic AI for Trustworthy AML Compliance Narratives</h4>
+      <div class="src">Naik et al. · arXiv:2509.08380</div>
+      <p>An industrial multi-agent framework for SAR narrative generation, validated by six expert AML investigators. Supplies the <b>agent decomposition</b> and privacy handling.</p>
+      <ul>
+        <li>Data Ingestion &amp; Structuring layer feeding all agents</li>
+        <li>AI-Privacy Guard: anonymize sensitive entities before any external model call, unmask on return</li>
+        <li>Crime-type detection: risk-indicator extraction + tree-ensemble classifiers → ranked typologies with confidence</li>
+        <li>Planning agent dynamically spawns typology-specific agents</li>
+        <li>Compliance Validation Agent (Agent-as-a-Judge) + golden-dataset evaluation</li>
+      </ul>
+    </div>
+    <div class="paper">
+      <span class="pid">[P3]</span>
+      <h4>Explainable AML Triage with LLMs: Evidence Retrieval and Counterfactual Checks</h4>
+      <div class="src">Torres, Cheng &amp; Hu · arXiv:2604.19755</div>
+      <p>Formalizes triage as an <b>evidence-constrained decision process</b> and shows on public synthetic benchmarks that grounding + verification beats both classical ML and free LLM generation. Supplies the evidence model, output contract, verifier, and counterfactual layer.</p>
+      <ul>
+        <li>Evidence pool ℰ = {policy, KYC, triggers, transactions, prior cases}, each item with stable ID, timestamp, source type, ACL tag</li>
+        <li>Hybrid retrieval → compact evidence bundle B(a) with per-type quotas</li>
+        <li>Output contract: disposition, confidence, cited rationale, supporting vs contradicting vs <i>missing</i> evidence, next actions</li>
+        <li>Verify-and-repair loop; decision &amp; evidence counterfactual checks</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2 class="sec"><span class="n">F.1</span> How the papers map onto the system</h2>
+  <table class="data">
+    <thead><tr><th>System component</th><th>Method adopted</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Ingestion &amp; canonical event model</td><td>Data Ingestion &amp; Structuring layer: raw alert data, transaction records, account metadata → structured summaries feeding all downstream agents</td><td class="m">[P2] §5.2</td></tr>
+      <tr><td>Financial knowledge graph</td><td>Nodes = accounts, banks, entities; edges = transactions with amount/timestamp attributes; annotated metadata per node</td><td class="m">[P1] §2.1</td></tr>
+      <tr><td>Case scoping</td><td>k-hop subgraph extraction centered on the alerted transaction edge (edge-centric classification framing)</td><td class="m">[P1] §2.1</td></tr>
+      <tr><td>AI-readable case text</td><td>Deterministic textual serialization: role-tagged nodes, natural-language edges, temporal ordering, no lossy summarization</td><td class="m">[P1] §2.2</td></tr>
+      <tr><td>Evidence model</td><td>Every artifact = evidence item {stable ID, source type, effective timestamp, ACL, canonical text, structured fields}</td><td class="m">[P3] §2.2, §3.2</td></tr>
+      <tr><td>Retrieval into context</td><td>Hybrid structured filtering + semantic ranking; per-type quotas; dedup; latest-effective policy versions only</td><td class="m">[P3] §3.2</td></tr>
+      <tr><td>Privacy</td><td>Mask class-1/2 sensitive entities pre-LLM; reversible unmasking post-analysis; re-mask before external feedback</td><td class="m">[P2] §5.3</td></tr>
+      <tr><td>Typology awareness</td><td>Few-shot canonical-pattern demonstrations + ML crime-type detector producing ranked typologies that steer agent planning</td><td class="m">[P1] §2.3 · [P2] §5.4–5.6</td></tr>
+      <tr><td>Output &amp; auditability</td><td>Structured triage record with per-paragraph citations; supporting / contradicting / missing evidence separated</td><td class="m">[P3] §2.3, §3.3</td></tr>
+      <tr><td>Verification</td><td>Provenance-integrity + numerical/temporal consistency checks; targeted-feedback repair loop; Agent-as-a-Judge live validation</td><td class="m">[P3] §3.3 · [P2] §5.9, §8</td></tr>
+      <tr><td>Faithfulness</td><td>Decision counterfactuals (minimal plausible edits that flip the outcome) + evidence counterfactuals (remove a critical item, verify the rationale reacts)</td><td class="m">[P3] §3.4</td></tr>
+      <tr><td>Cost control</td><td>Lightweight scorer triages all alerts; full LLM pipeline reserved for ambiguous / high-risk band</td><td class="m">[P1] §4 · [P3] §7.5</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><p><b>Why this combination.</b> [P3] demonstrates empirically that an LLM alone is a weak triage predictor, but the same LLM inside an evidence-grounded, verified workflow outperforms rules, gradient-boosted and graph-ML baselines while nearly eliminating fabricated citations and numerical errors. [P1] supplies the representation that makes graph-shaped laundering behavior legible to the model, and [P2] supplies the agent decomposition and privacy layer proven with practitioner evaluation. The methodology below is the composition of the three.</p></div>
+</section>
+
+<!-- ============ 02 DATA METHODOLOGY ============ -->
+<section class="panel" id="tab-data" role="tabpanel" hidden>
+  <p class="eyebrow">The core of the system</p>
+  <h1 class="big">D0–D7: from Excel files to an evidence bundle.</h1>
+  <p class="cap">Eight deterministic stages transform raw exports — transaction lists, KYC extracts, alert dumps — into the representations the papers require: a financial knowledge graph, a serialized case subgraph, and a citable evidence bundle. Every stage is code, not model output: reproducible, testable, and versioned. All examples below are <b>structural templates with placeholder tokens</b>, never real or invented values.</p>
+
+  <div class="pipe">
+    <div class="steps" role="tablist" aria-label="Data stages">
+      <button class="step active" data-step="0"><span class="num">D0</span><span><span class="st-t">Source contracts &amp; ingestion</span><span class="st-d">xlsx / csv / exports → staged tables</span></span></button>
+      <button class="step" data-step="1"><span class="num">D1</span><span><span class="st-t">Canonical event model</span><span class="st-d">one typed grain, full lineage</span></span></button>
+      <button class="step" data-step="2"><span class="num">D2</span><span><span class="st-t">Entity resolution &amp; graph build</span><span class="st-d">rows → financial knowledge graph</span></span></button>
+      <button class="step" data-step="3"><span class="num">D3</span><span><span class="st-t">Alert anchoring &amp; k-hop extraction</span><span class="st-d">case scope per [P1]</span></span></button>
+      <button class="step" data-step="4"><span class="num">D4</span><span><span class="st-t">Quantitative feature dossier</span><span class="st-d">deterministic aggregates + baselines</span></span></button>
+      <button class="step" data-step="5"><span class="num">D5</span><span><span class="st-t">Textual serialization</span><span class="st-d">subgraph → structured text per [P1]</span></span></button>
+      <button class="step" data-step="6"><span class="num">D6</span><span><span class="st-t">Evidence items &amp; bundle B(a)</span><span class="st-d">stable IDs, ACL, retrieval per [P3]</span></span></button>
+      <button class="step" data-step="7"><span class="num">D7</span><span><span class="st-t">Privacy guard &amp; typology conditioning</span><span class="st-d">mask per [P2] · few-shot per [P1]</span></span></button>
+    </div>
+    <div class="stage-detail" id="stageDetail"></div>
+  </div>
+
+  <h2 class="sec"><span class="n">D7+</span> The eight canonical laundering topologies used as few-shot demonstrations</h2>
+  <p class="cap">From [P1] §2.3 — the exemplar library is built from these structural patterns, each paired with a serialized subgraph in the D5 format plus an analyst-style rationale, alongside benign counter-examples so the model learns to distinguish, not just to accuse.</p>
+  <div class="typo-grid" id="typoGrid"></div>
+</section>
+
+<!-- ============ 03 AGENT ============ -->
+<section class="panel" id="tab-agent" role="tabpanel" hidden>
+  <p class="eyebrow">Reasoning under constraint</p>
+  <h1 class="big">The agent never writes freely — it fills a contract.</h1>
+  <p class="cap">Following [P3], triage is an evidence-constrained decision process: the model may only assert what it can cite from the bundle, its output must follow a fixed schema, and everything it produces is machine-verified and counterfactually stress-tested before an investigator sees it.</p>
+
+  <h2 class="sec"><span class="n">A.1</span> Orchestration — the [P2] sub-agent pattern</h2>
+  <div class="flowband">
+    <div class="fb det"><div class="fk">deterministic</div><div class="ft">D0–D7 pipeline</div><p>Produces the evidence bundle B(a). No LLM involved.</p></div>
+    <div class="fb det"><div class="fk">ml · [P2] §5.4</div><div class="ft">Crime-type detector</div><p>Risk indicators + tree ensemble → ranked typologies with confidence.</p></div>
+    <div class="fb prob"><div class="fk">agent · [P2] §5.5</div><div class="ft">Planning agent</div><p>Spawns only the typology agents relevant to the ranked list.</p></div>
+    <div class="fb prob"><div class="fk">agents · [P2] §5.6</div><div class="ft">Typology agents</div><p>Each examines the bundle for its pattern — for and against.</p></div>
+    <div class="fb prob"><div class="fk">agent · [P3] §3.3</div><div class="ft">Triage writer</div><p>Fills the structured output contract, citing evidence IDs only.</p></div>
+    <div class="fb det"><div class="fk">verify · [P3] §3.3</div><div class="ft">Verifier + repair</div><p>Provenance &amp; consistency checks; targeted feedback; regenerate.</p></div>
+    <div class="fb det"><div class="fk">verify · [P3] §3.4</div><div class="ft">Counterfactuals</div><p>Decision + evidence perturbation tests before release.</p></div>
+    <div class="fb"><div class="fk">human</div><div class="ft">Investigator</div><p>Reviews, edits, decides. Feedback captured per [P2] §5.10.</p></div>
+  </div>
+
+  <h2 class="sec"><span class="n">A.2</span> The output contract</h2>
+  <p class="cap">Exactly the structured triage record of [P3] §2.3: not an essay, a schema. Two properties matter most for compliance review: <b>every rationale paragraph must carry at least one evidence citation</b>, and the record must explicitly separate what supports the concern, what contradicts it, and what is <i>missing</i> — because in AML, absence of corroboration is decision-relevant information.</p>
+  <div class="code"><div class="code-bar">triage_record — output schema (types, not values)</div>
+<pre><span class="c-punc">{</span>
+  <span class="c-key">"disposition"</span><span class="c-punc">:</span>     <span class="c-str">"dismiss | monitor | escalate"</span><span class="c-punc">,</span>
+  <span class="c-key">"confidence"</span><span class="c-punc">:</span>      <span class="c-str">"calibrated score"</span><span class="c-punc">,</span>          <span class="c-com">// [P3] §2.3: u</span>
+  <span class="c-key">"typologies"</span><span class="c-punc">:</span>      <span class="c-str">"ranked list + scores"</span><span class="c-punc">,</span>       <span class="c-com">// routes workflow</span>
+  <span class="c-key">"rationale"</span><span class="c-punc">:</span>       <span class="c-str">"paragraphs; each ≥1 citation to an evidence_id"</span><span class="c-punc">,</span>
+  <span class="c-key">"evidence"</span><span class="c-punc">:</span> <span class="c-punc">{</span>
+    <span class="c-key">"supporting"</span><span class="c-punc">:</span>    <span class="c-str">"[evidence_id, …]"</span><span class="c-punc">,</span>
+    <span class="c-key">"contradicting"</span><span class="c-punc">:</span> <span class="c-str">"[evidence_id, …]"</span><span class="c-punc">,</span>
+    <span class="c-key">"missing"</span><span class="c-punc">:</span>       <span class="c-str">"what was sought and not found"</span>  <span class="c-com">// explicit unknowns</span>
+  <span class="c-punc">}</span><span class="c-punc">,</span>
+  <span class="c-key">"next_actions"</span><span class="c-punc">:</span>    <span class="c-str">"RFI / expand lookback / check related accounts"</span><span class="c-punc">,</span>
+  <span class="c-key">"counterfactuals"</span><span class="c-punc">:</span> <span class="c-str">"validated minimal flip conditions"</span>   <span class="c-com">// [P3] §3.4</span>
+<span class="c-punc">}</span></pre></div>
+
+  <h2 class="sec"><span class="n">A.3</span> Verification — two independent layers</h2>
+  <div class="grid g2">
+    <div class="card">
+      <span class="kicker">Layer 1 · verify-and-repair · [P3] §3.3</span>
+      <h4>Provenance &amp; consistency verifier</h4>
+      <p><b>Provenance integrity:</b> every cited <span class="pref">evidence_id</span> must exist in the supplied bundle — fabricated citations are rejected outright.</p>
+      <p><b>Numerical &amp; temporal consistency:</b> every amount, date, ordering claim and threshold comparison in the rationale is checked against the structured fields of the cited item.</p>
+      <p><b>Repair loop:</b> a failed check returns targeted feedback (e.g. "cited ID absent from bundle", "stated total conflicts with evidence <span class="pref">E_T#</span>") and triggers bounded regeneration — the draft cannot reach the investigator until checks pass.</p>
+    </div>
+    <div class="card">
+      <span class="kicker">Layer 2 · counterfactual checks · [P3] §3.4</span>
+      <h4>Faithfulness stress tests</h4>
+      <p><b>Decision counterfactuals:</b> propose minimal, plausible edits to the case (toggle a claimed key indicator, adjust a counterparty risk tier, narrow the window, remove one graph path) within an edit budget and plausibility rules; a policy-approximate validator confirms the disposition flips as the rationale claims it should.</p>
+      <p><b>Evidence counterfactuals:</b> remove a critical cited item and re-run — the model must stop citing it and adjust its conclusion coherently. This is the direct test against "decorative citations": explanations that sound grounded but don't actually drive the decision.</p>
+    </div>
+  </div>
+
+  <div class="callout"><p><b>Why an LLM at all, then?</b> Because [P3]'s ablations show the ordering clearly: the LLM alone is the weakest triage method they tested — worse than gradient boosting — but the LLM inside this evidence-constrained, verified loop is the strongest, beating rules, tabular ML and graph-ML baselines on both ranking quality and escalate-F1 while raising citation validity and evidence support to near-perfect levels. The value is not free-form reasoning; it is structured decision support over explicit evidence.</p></div>
+
+  <h2 class="sec"><span class="n">A.4</span> Cost &amp; routing</h2>
+  <p class="cap">Per [P1] §4 and [P3] §7.5: not every alert needs the full pipeline. A lightweight scorer (the D4 features feeding a gradient-boosted or graph model) triages the whole queue; clear-cut alerts get the fast path, and only the ambiguous or high-risk band is routed through subgraph serialization, full agent investigation, verification and counterfactual checks. Repair iterations and counterfactual budget are capped per alert. This keeps latency and inference cost proportional to case difficulty.</p>
+</section>
+
+<!-- ============ 04 EVALUATION ============ -->
+<section class="panel" id="tab-eval" role="tabpanel" hidden>
+  <p class="eyebrow">Proving it, honestly</p>
+  <h1 class="big">Measured the way the papers measure it.</h1>
+  <p class="cap">The evaluation plan adopts the metric suite of [P3] §5 and the golden-dataset protocol of [P2] §7, instantiated first on public synthetic benchmarks and our own backtesting archive, then in shadow mode. We report nothing we have not measured — the only numbers in this section are the papers' published results, clearly attributed.</p>
+
+  <h2 class="sec"><span class="n">E.1</span> Metric suite ([P3] §5)</h2>
+  <table class="data">
+    <thead><tr><th>Metric</th><th>Definition</th><th>Failure mode it guards against</th></tr></thead>
+    <tbody>
+      <tr><td class="m">Escalate P / R / F1, PR-AUC</td><td>Quality of the escalate decision under heavy class imbalance</td><td>Missing true cases; drowning analysts in false escalations</td></tr>
+      <tr><td class="m">Citation validity</td><td>Share of cited evidence IDs that actually exist in the supplied bundle</td><td>Fabricated citations</td></tr>
+      <tr><td class="m">Evidence support rate</td><td>Share of rationale sentences whose cited item really contains the referenced entities, amounts, timestamps</td><td>Plausible text unbacked by its own sources</td></tr>
+      <tr><td class="m">Coverage of decision drivers</td><td>Top stated reasons backed by ≥1 policy/typology item and ≥1 case-context item</td><td>Conclusions without the two-sided justification AML review requires</td></tr>
+      <tr><td class="m">CF-flip rate</td><td>Share of alerts where a valid minimal flip condition is found within the edit budget</td><td>Unfalsifiable, non-actionable rationales</td></tr>
+      <tr><td class="m">Evidence-faithfulness under removal</td><td>Model stops citing a removed critical item and updates its conclusion coherently</td><td>Decorative citations</td></tr>
+      <tr><td class="m">CF-stability</td><td>Decision unchanged under irrelevant perturbations (benign reordering, immaterial noise)</td><td>Brittle, arbitrary dispositions</td></tr>
+      <tr><td class="m">Numerical inconsistency rate</td><td>Wrong amounts, totals, thresholds or orderings relative to evidence</td><td>The costliest documentation error in a filed report</td></tr>
+      <tr><td class="m">Policy hallucination rate</td><td>Policy claims not present in the versioned policy corpus</td><td>Invented compliance logic</td></tr>
+      <tr><td class="m">Unsupported assertion rate</td><td>Sentences introducing entities or facts absent from all cited evidence</td><td>Silent fact invention</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="sec"><span class="n">E.2</span> What the published benchmarks already show ([P3] Table 1)</h2>
+  <p class="cap">On SynthAML / AMLSim-based benchmarks, the paper reports its full pipeline (retrieval grounding + counterfactual checks) at PR-AUC 0.75 and Escalate-F1 0.62 — above graph-ML (0.69 / 0.56), tabular GBDT (0.63 / 0.51), rules (0.41 / 0.29) and the LLM-only baseline (0.52 / 0.41) — with citation validity 0.98, evidence support 0.88, counterfactual faithfulness 0.76, and numerical-inconsistency and policy-hallucination rates reduced to 0.03 and 0.02. These are the authors' published results on public synthetic data, cited here as external evidence for the architecture choice — <b>not</b> our system's performance, which will be measured on our own cases before any claim is made.</p>
+
+  <h2 class="sec"><span class="n">E.3</span> Protocol discipline</h2>
+  <div class="grid g3">
+    <div class="card"><span class="kicker">[P3] §4.4</span><h4>Time-aware splits</h4><p>Train on earlier alerts, validate and test strictly on later ones — matching deployment reality and avoiding the optimism of random splits on time-evolving transaction data.</p></div>
+    <div class="card"><span class="kicker">[P3] §4.4</span><h4>Retrieval leakage control</h4><p>Case memory indexes training-period cases only; no test labels or post-decision artifacts are ever retrievable. In RAG systems retrieval is otherwise an inadvertent label channel.</p></div>
+    <div class="card"><span class="kicker">[P2] §7</span><h4>Golden datasets</h4><p>Expert-annotated adjudicated cases as the benchmark; hybrid scoring combining rule-based factual checks on the intro elements with weighted semantic assessment of the narrative body.</p></div>
+  </div>
+
+  <h2 class="sec"><span class="n">E.4</span> Staged rollout ([P3] §7.3)</h2>
+  <div class="flowband">
+    <div class="fb"><div class="fk">stage 1</div><div class="ft">Synthetic benchmarks</div><p>Functional correctness and failure-mode analysis on public AML simulators + our synthetic corpus.</p></div>
+    <div class="fb"><div class="fk">stage 2</div><div class="ft">Historical backtest</div><p>Full metric suite on adjudicated closed cases from the backtesting archive, per typology and per segment.</p></div>
+    <div class="fb"><div class="fk">stage 3</div><div class="ft">Shadow mode</div><p>Agent drafts in parallel; investigators decide independently; agreement and time measured before any output is shown pre-decision.</p></div>
+    <div class="fb"><div class="fk">stage 4</div><div class="ft">Guarded assist</div><p>Drafts shown with mandatory human sign-off, sampled QC, drift monitoring, capped repair &amp; counterfactual budgets.</p></div>
+  </div>
+
+  <div class="callout"><p><b>Governance posture.</b> The D0–D7 pipeline and both verifiers are deterministic, versioned code — validatable under standard model-risk treatment. The LLM layer is decision support: it never dispositions autonomously, its factual scope is bounded by the retrieved bundle ([P3] R1–R4), its outputs are machine-verified, and every retrieval, tool call, verifier result and counterfactual outcome is logged as the audit trail [P3] §7.2 describes for model-risk management.</p></div>
+</section>
+
+<div class="foot">
+  <span>SENTINEL / TM Investigator — methodology grounded in arXiv:2507.14785 · 2509.08380 · 2604.19755</span>
+  <span>structural placeholders only · no fabricated data</span>
+</div>
+</main>
+
+<script>
+/* ---------- tabs ---------- */
+const tabs=document.querySelectorAll('.tab-btn');
+const map={found:'tab-found',data:'tab-data',agent:'tab-agent',eval:'tab-eval'};
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');
+  Object.values(map).forEach(id=>document.getElementById(id).hidden=true);
+  document.getElementById(map[t.dataset.tab]).hidden=false;window.scrollTo(0,0);
+}));
+
+/* ---------- stage content ---------- */
+const S=[
+{t:"D0 · Source contracts & ingestion",
+ body:`<p>Each upstream export gets a formal <b>ingestion contract</b> — a versioned specification of exactly what the file must look like and how it maps to the canonical model. This is where Excel reality is absorbed: locale-dependent decimal separators, per-source date conventions, merged headers, multiple sheets, trailing footer rows, inconsistent encodings.</p>
+ <p>The contract declares, per source: expected sheet/column set, a <b>header-mapping dictionary</b> (source column → canonical field), declared dtypes, locale rules (decimal mark, date pattern, thousands separator), encoding, and mandatory-field constraints. Parsing is strict: a row either satisfies the contract or is <b>quarantined with a reject code</b> — never silently coerced.</p>
+ <p>Validation runs at two levels. <b>Row gates:</b> parseable timestamp, numeric amount, non-null account reference, direction resolvable. <b>File gates:</b> row count vs. manifest, period coverage vs. the requested review window, duplicate-file detection via content hash. Every ingestion emits a machine-readable report; a failed file gate blocks the case from proceeding rather than degrading it silently — [P3] R5 requires graceful degradation with explicit uncertainty, and that starts here.</p>`,
+ in:["Transaction extract (xlsx/csv, per-entity conventions)","KYC / CDD extract","TM engine alert export (rules, thresholds, trigger sets)","Relationship / account-link table","Screening results export","Prior alert &amp; case-note archive"],
+ out:["Staged, typed tables per source","Ingestion report: accepted / quarantined counts, gate results","Quarantine store with reject codes for remediation","Content-hash registry for idempotent re-runs"],
+ code:{f:"ingestion_contract.yaml — structure (illustrative fields, not values)",b:
+`<span class="c-key">source</span><span class="c-punc">:</span> <span class="c-str">transaction_extract</span>
+<span class="c-key">format</span><span class="c-punc">:</span> <span class="c-str">xlsx</span>          <span class="c-key">sheet</span><span class="c-punc">:</span> <span class="c-tok">&lt;SHEET_NAME&gt;</span>
+<span class="c-key">locale</span><span class="c-punc">:</span> <span class="c-punc">{</span> <span class="c-key">decimal</span><span class="c-punc">:</span> <span class="c-str">","</span><span class="c-punc">,</span> <span class="c-key">date_pattern</span><span class="c-punc">:</span> <span class="c-str">"DD/MM/YYYY"</span> <span class="c-punc">}</span>
+<span class="c-key">header_map</span><span class="c-punc">:</span>
+  <span class="c-tok">&lt;SRC_DATE_COL&gt;</span><span class="c-punc">:</span>   <span class="c-str">booking_ts</span>
+  <span class="c-tok">&lt;SRC_AMT_COL&gt;</span><span class="c-punc">:</span>    <span class="c-str">amount_original</span>
+  <span class="c-tok">&lt;SRC_CCY_COL&gt;</span><span class="c-punc">:</span>    <span class="c-str">currency</span>
+  <span class="c-tok">&lt;SRC_PARTY_COL&gt;</span><span class="c-punc">:</span>  <span class="c-str">counterparty_raw</span>
+<span class="c-key">mandatory</span><span class="c-punc">:</span> <span class="c-punc">[</span><span class="c-str">booking_ts</span><span class="c-punc">,</span> <span class="c-str">amount_original</span><span class="c-punc">,</span> <span class="c-str">account_ref</span><span class="c-punc">]</span>
+<span class="c-key">row_gates</span><span class="c-punc">:</span>  <span class="c-punc">[</span><span class="c-str">ts_parseable</span><span class="c-punc">,</span> <span class="c-str">amount_numeric</span><span class="c-punc">,</span> <span class="c-str">direction_resolvable</span><span class="c-punc">]</span>
+<span class="c-key">file_gates</span><span class="c-punc">:</span> <span class="c-punc">[</span><span class="c-str">rowcount_vs_manifest</span><span class="c-punc">,</span> <span class="c-str">period_coverage</span><span class="c-punc">,</span> <span class="c-str">dedup_hash</span><span class="c-punc">]</span>`},
+ g:"Implements the Data Ingestion &amp; Structuring layer of <b>[P2] §5.2</b> — the component that transforms raw alert data, transaction records and account metadata into structured inputs for every downstream agent."},
+
+{t:"D1 · Canonical event model",
+ body:`<p>All accepted rows are rewritten to <b>one typed event grain</b>. Six formats becoming one schema is the precondition for everything else: identical computation of every downstream number, and identical serialization of identical facts.</p>
+ <p>Key design rules. <b>Deterministic identity:</b> <span class="pref">event_id</span> is a hash of source file, sheet, row key and business fields, making re-ingestion idempotent and lineage stable. <b>Dual-amount representation:</b> the original amount and currency are preserved verbatim, alongside a reference-currency conversion carrying its own <span class="pref">fx_rate_ref</span> — so any converted figure can be traced to the rate applied, satisfying the numerical-traceability requirement [P3] R6. <b>Timezone discipline:</b> all timestamps to UTC with the source offset recorded. <b>Controlled vocabularies:</b> direction, channel and status become enums; free text is preserved in <span class="pref">*_raw</span> fields, never destroyed. <b>Per-field provenance:</b> every field carries its <span class="pref">source_ref</span> (file, sheet, row), which later becomes the lineage of every evidence item.</p>`,
+ in:["Staged typed tables from D0"],
+ out:["Canonical event log (append-only, versioned)","Customer / account master records","Alert objects with rule refs, thresholds, trigger-set links","Full field-level lineage to file · sheet · row"],
+ code:{f:"canonical_event — schema (types only)",b:
+`<span class="c-punc">{</span>
+  <span class="c-key">"event_id"</span><span class="c-punc">:</span>        <span class="c-str">hash(source_ref + business_key)</span><span class="c-punc">,</span>
+  <span class="c-key">"account_id"</span><span class="c-punc">:</span>      <span class="c-str">canonical account reference</span><span class="c-punc">,</span>
+  <span class="c-key">"ts_utc"</span><span class="c-punc">:</span>          <span class="c-str">ISO-8601, source offset retained</span><span class="c-punc">,</span>
+  <span class="c-key">"amount_original"</span><span class="c-punc">:</span> <span class="c-str">decimal + currency, verbatim</span><span class="c-punc">,</span>
+  <span class="c-key">"amount_ref_ccy"</span><span class="c-punc">:</span>  <span class="c-str">decimal + fx_rate_ref (traceable)</span><span class="c-punc">,</span>
+  <span class="c-key">"direction"</span><span class="c-punc">:</span>       <span class="c-str">enum(in | out)</span><span class="c-punc">,</span>
+  <span class="c-key">"channel"</span><span class="c-punc">:</span>         <span class="c-str">controlled vocabulary</span><span class="c-punc">,</span>
+  <span class="c-key">"counterparty_raw"</span><span class="c-punc">:</span><span class="c-str">preserved source text</span><span class="c-punc">,</span>
+  <span class="c-key">"counterparty_id"</span><span class="c-punc">:</span> <span class="c-str">filled at D2 (resolution)</span><span class="c-punc">,</span>
+  <span class="c-key">"source_ref"</span><span class="c-punc">:</span>      <span class="c-str">{file, sheet, row}</span>
+<span class="c-punc">}</span>`},
+ g:"The structured-summary substrate required by <b>[P2] §5.2</b>; the verbatim-plus-converted amount design directly serves the numerical/temporal consistency checks of <b>[P3] §3.3</b> and requirement R6."},
+
+{t:"D2 · Entity resolution & knowledge graph build",
+ body:`<p>[P1] represents financial activity as a knowledge graph whose <b>nodes are accounts and banks and whose edges are transactions</b> annotated with amount and timestamp, with metadata such as entity type and account creation date on each node. We construct exactly that, extended with the relationship data investigators already receive.</p>
+ <p><b>Resolution before graphing.</b> Counterparty strings from different systems name the same real party inconsistently. The resolver applies, in order: normalization (case, diacritics, legal-form suffixes, whitespace), exact match on strong identifiers where present, then similarity matching on normalized names with a decision band — matches above the upper threshold auto-merge, matches in the review band go to a human queue, below the lower threshold they remain distinct. <b>Survivorship rules</b> pick the canonical attribute set for merged entities; every merge decision is logged and reversible.</p>
+ <p><b>Node types:</b> Customer, Account, Counterparty, Bank/Institution. <b>Edge types:</b> <span class="pref">transfers_to</span> (one edge per canonical event, carrying amount, timestamp, channel), <span class="pref">belongs_to</span> (account → institution, per [P1]), <span class="pref">linked_by_attribute</span> (shared address / phone / registration data from the relationship table), and ownership edges where KYC provides them. Node metadata includes entity type and creation/incorporation date — the attributes [P1] shows the model uses in its rationales.</p>`,
+ in:["Canonical event log","Relationship / link table","KYC master records"],
+ out:["Property graph: typed nodes + typed edges, all with source_refs","Resolution log: merges, review-band queue, survivorship decisions","Per-node metadata: entity type, creation date, risk attributes"],
+ code:{f:"graph elements — structure",b:
+`<span class="c-com">// nodes</span>
+<span class="c-tok">&lt;ACCT_i&gt;</span>  <span class="c-punc">:</span> <span class="c-key">Account</span><span class="c-punc">(</span><span class="c-key">entity_type</span><span class="c-punc">,</span> <span class="c-key">created_date</span><span class="c-punc">,</span> <span class="c-key">institution_ref</span><span class="c-punc">)</span>
+<span class="c-tok">&lt;BANK_j&gt;</span>  <span class="c-punc">:</span> <span class="c-key">Bank</span><span class="c-punc">(</span><span class="c-key">jurisdiction</span><span class="c-punc">)</span>
+<span class="c-com">// edges</span>
+<span class="c-tok">&lt;ACCT_a&gt;</span> <span class="c-key">transfers_to</span> <span class="c-tok">&lt;ACCT_b&gt;</span> <span class="c-punc">(</span><span class="c-key">amount</span><span class="c-punc">,</span> <span class="c-key">ts</span><span class="c-punc">,</span> <span class="c-key">channel</span><span class="c-punc">,</span> <span class="c-key">event_id</span><span class="c-punc">)</span>
+<span class="c-tok">&lt;ACCT_a&gt;</span> <span class="c-key">belongs_to</span> <span class="c-tok">&lt;BANK_j&gt;</span>
+<span class="c-tok">&lt;CP_x&gt;</span>   <span class="c-key">linked_by_attribute</span> <span class="c-tok">&lt;CP_y&gt;</span> <span class="c-punc">(</span><span class="c-key">attribute_type</span><span class="c-punc">)</span>`},
+ g:"Direct implementation of the financial knowledge graph of <b>[P1] §2.1</b>; the account-linking analysis of <b>[P2] §5.12</b> corresponds to the attribute-link edges surfaced here."},
+
+{t:"D3 · Alert anchoring & k-hop subgraph extraction",
+ body:`<p>[P1] frames detection as an <b>edge-centric problem</b>: the unit of analysis is a transaction edge and its local neighborhood, not the whole graph. We adopt this as the case-scoping rule.</p>
+ <p>For each alert cluster (customer × account × review window): the TM engine export identifies the <b>triggering transaction set</b>; those edges are the anchors. The extractor takes the <b>k-hop neighborhood</b> around the anchors — source and destination accounts, their neighboring transactions within k hops, and associated bank nodes, exactly as [P1] specifies. k is a configuration parameter tuned per typology family during evaluation, not hard-coded.</p>
+ <p>Two bounds keep the subgraph legible and honest. <b>Expansion caps</b>: per-hop limits on nodes and edges, with deterministic priority (anchor-adjacency first, then edge weight) so extraction is reproducible. <b>Temporal filter</b>: only edges inside the alert window plus a configured lookback, so the subgraph is the case's time slice, not the account's lifetime. When caps truncate the neighborhood, the truncation itself is recorded — it becomes a "missing evidence" entry in the output contract rather than a silent omission, per [P3] R5.</p>`,
+ in:["Knowledge graph (D2)","Alert objects with trigger-set links (D1)","Config: k, per-hop caps, lookback per rule family"],
+ out:["Case subgraph: anchor edges + bounded k-hop neighborhood","Extraction manifest: k, caps applied, truncation flags","Deterministic — same alert + same graph ⇒ same subgraph"],
+ code:{f:"extraction — parameters (design, not case data)",b:
+`<span class="c-key">anchors</span><span class="c-punc">:</span>      <span class="c-str">trigger-set edges from the TM export</span>
+<span class="c-key">k</span><span class="c-punc">:</span>            <span class="c-str">hops, configured per rule family</span>
+<span class="c-key">hop_caps</span><span class="c-punc">:</span>     <span class="c-str">max nodes / edges per hop, priority-ordered</span>
+<span class="c-key">time_scope</span><span class="c-punc">:</span>   <span class="c-str">alert window ± configured lookback</span>
+<span class="c-key">on_truncation</span><span class="c-punc">:</span><span class="c-str">record → surfaces as "missing evidence"</span>`},
+ g:"The localized k-hop extraction strategy of <b>[P1] §2.1</b>, with truncation surfaced as explicit unknowns per <b>[P3]</b> R5."},
+
+{t:"D4 · Quantitative feature dossier",
+ body:`<p>The LLM never computes a number — [P3] identifies numerical inconsistency as a core LLM failure mode over financial tabular data (R6), so all quantities are produced here, in code, before any model sees the case.</p>
+ <p><b>Aggregate families</b>, each a documented formula over canonical events: window totals in/out and transaction counts; velocity and burstiness; counterparty concentration; inflow→outflow interval statistics (pass-through behavior); round-amount share; sub-threshold clustering relative to the applicable reporting limit; new-counterparty share; channel and corridor mix.</p>
+ <p><b>Triple-baseline framing.</b> Each aggregate is contextualized three ways: against the customer's <b>own trailing distribution</b> (standardized deviation), against the <b>declared expected activity</b> from KYC (ratio to the declared band), and against the <b>peer-segment distribution</b> (percentile position). A raw figure means nothing without an expectation to compare it to; the three baselines make the comparison explicit, reproducible and challengeable — and they cut both ways, supporting benign explanations as often as suspicious ones.</p>
+ <p>Every computed feature is emitted with its formula reference and the list of contributing <span class="pref">event_id</span>s — this lineage is what lets the D6 verifier later re-execute any figure the model cites.</p>`,
+ in:["Canonical event log (D1)","Case subgraph (D3)","KYC declared-activity fields","Segment reference distributions (from the backtesting archive)"],
+ out:["Feature dossier: value + formula ref + contributing event_ids","Baseline comparisons: vs-own, vs-declared, vs-peer, per feature","All numeric claims downstream trace here"],
+ code:{f:"feature record — structure",b:
+`<span class="c-punc">{</span>
+  <span class="c-key">"feature"</span><span class="c-punc">:</span>     <span class="c-str">name from the documented catalogue</span><span class="c-punc">,</span>
+  <span class="c-key">"window"</span><span class="c-punc">:</span>      <span class="c-str">explicit period</span><span class="c-punc">,</span>
+  <span class="c-key">"value"</span><span class="c-punc">:</span>       <span class="c-str">computed in code</span><span class="c-punc">,</span>
+  <span class="c-key">"formula_ref"</span><span class="c-punc">:</span> <span class="c-str">versioned definition</span><span class="c-punc">,</span>
+  <span class="c-key">"lineage"</span><span class="c-punc">:</span>     <span class="c-str">[event_id, …]</span><span class="c-punc">,</span>
+  <span class="c-key">"baselines"</span><span class="c-punc">:</span> <span class="c-punc">{</span>
+    <span class="c-key">"vs_own"</span><span class="c-punc">:</span>      <span class="c-str">standardized deviation</span><span class="c-punc">,</span>
+    <span class="c-key">"vs_declared"</span><span class="c-punc">:</span> <span class="c-str">ratio to KYC-declared band</span><span class="c-punc">,</span>
+    <span class="c-key">"vs_peer"</span><span class="c-punc">:</span>     <span class="c-str">segment percentile</span>
+  <span class="c-punc">}</span>
+<span class="c-punc">}</span>`},
+ g:"Serves <b>[P3]</b> R6 (no fabricated figures — numbers computed and traceable) and provides the structured features the crime-type detector of <b>[P2] §5.4</b> consumes."},
+
+{t:"D5 · Textual serialization of the case subgraph",
+ body:`<p>The bridge between graph and language model. [P1] §2.2 specifies the format: each node as a <b>role-tagged entity</b>, each edge as a <b>natural-language relation preserving directionality, timestamps and values</b>, laid out in logical (temporal) order to facilitate multi-hop reasoning — with <b>no lossy summarization</b> applied to the subgraph itself.</p>
+ <p>Our additions for production use. <b>Determinism:</b> a fixed template and a fixed ordering rule (temporal, then anchor-adjacency) so identical subgraphs always serialize identically — required for caching, regression testing, and audit reproduction. <b>Token discipline:</b> entities appear as resolved IDs, never free-text names (the privacy guard in D7 then has a clean substitution surface). <b>Anchor marking:</b> the alerted edges are explicitly tagged so the model knows what it is being asked about, per the edge-centric framing.</p>`,
+ in:["Case subgraph (D3)","Resolution table (D2) for entity IDs"],
+ out:["Deterministic serialized case text","Stable serialization hash for caching &amp; audit replay"],
+ code:{f:"serialization template — placeholder tokens only",b:
+`<span class="c-com">== NODES ==</span>
+<span class="c-tok">&lt;ACCT_A&gt;</span> <span class="c-punc">:</span> <span class="c-key">Account</span><span class="c-punc">(</span><span class="c-key">type</span><span class="c-punc">=</span><span class="c-tok">&lt;ENTITY_TYPE&gt;</span><span class="c-punc">,</span> <span class="c-key">created</span><span class="c-punc">=</span><span class="c-tok">&lt;DATE&gt;</span><span class="c-punc">)</span>
+<span class="c-tok">&lt;ACCT_B&gt;</span> <span class="c-punc">:</span> <span class="c-key">Account</span><span class="c-punc">(</span><span class="c-key">type</span><span class="c-punc">=</span><span class="c-tok">&lt;ENTITY_TYPE&gt;</span><span class="c-punc">,</span> <span class="c-key">created</span><span class="c-punc">=</span><span class="c-tok">&lt;DATE&gt;</span><span class="c-punc">)</span>
+<span class="c-tok">&lt;BANK_1&gt;</span> <span class="c-punc">:</span> <span class="c-key">Bank</span>
+
+<span class="c-com">== EDGES (temporal order) ==</span>
+<span class="c-punc">[</span><span class="c-tok">&lt;T0&gt;</span><span class="c-punc">]</span>    <span class="c-tok">&lt;ACCT_A&gt;</span> <span class="c-key">transfers_to</span> <span class="c-tok">&lt;ACCT_B&gt;</span>
+          <span class="c-punc">(</span><span class="c-key">amount</span><span class="c-punc">=</span><span class="c-tok">&lt;AMT&gt;</span> <span class="c-tok">&lt;CCY&gt;</span><span class="c-punc">,</span> <span class="c-key">channel</span><span class="c-punc">=</span><span class="c-tok">&lt;CH&gt;</span><span class="c-punc">)</span>  <span class="c-str">← ANCHOR</span>
+<span class="c-punc">[</span><span class="c-tok">&lt;T0+δ&gt;</span><span class="c-punc">]</span>  <span class="c-tok">&lt;ACCT_B&gt;</span> <span class="c-key">transfers_to</span> <span class="c-tok">&lt;ACCT_C&gt;</span>
+          <span class="c-punc">(</span><span class="c-key">amount</span><span class="c-punc">=</span><span class="c-tok">&lt;AMT&gt;</span> <span class="c-tok">&lt;CCY&gt;</span><span class="c-punc">,</span> <span class="c-key">channel</span><span class="c-punc">=</span><span class="c-tok">&lt;CH&gt;</span><span class="c-punc">)</span>
+<span class="c-tok">&lt;ACCT_A&gt;</span> <span class="c-key">belongs_to</span> <span class="c-tok">&lt;BANK_1&gt;</span>`},
+ g:"The textual serialization of <b>[P1] §2.2</b> — role-tagged entities, directional relations with timestamps and values, topology-preserving order, no summarization — hardened with determinism and anchor tagging."},
+
+{t:"D6 · Evidence items & bundle assembly B(a)",
+ body:`<p>Everything the model may cite becomes an <b>evidence item</b> in the [P3] format: stable identifier, source type, effective timestamp, access-control tag, a canonical text form for retrieval and citation, and structured fields for machine verification. The pool partitions as [P3] §2.2 defines it — policy/typology guidance (including our per-rule model cards), KYC context, alert-trigger metadata, transaction slices and the D5 serialized subgraph, computed features, and prior-case material.</p>
+ <p><b>Bundle assembly</b> follows [P3] §3.2 exactly. Retrieval is a hybrid: <b>structured filters first</b> (customer, alert window, rule type, ACL — disallowed evidence is never retrieved into context), then <b>semantic ranking</b> of the remaining candidates against a query derived from the alert context. The bundle is compact but coverage-preserving, with <b>per-type quotas</b> so the model always sees complementary perspectives rather than one dominant source; near-duplicates are removed by diversity-aware selection; and for policy material only the <b>latest effective version</b> is eligible, with superseded versions excluded.</p>
+ <p>This stage is the compliance boundary: what is retrievable defines what the model can factually assert, which is precisely how [P3] operationalizes data minimization (R4) and auditability (R1).</p>`,
+ in:["All D1–D5 artifacts","Versioned policy / typology / model-card corpus","Prior-case archive (QA-reviewed subset)"],
+ out:["Evidence pool ℰ with stable IDs and ACL tags","Per-alert bundle B(a): filtered, ranked, quota-balanced, deduplicated","Retrieval log — part of the audit trail"],
+ code:{f:"evidence_item — structure per [P3]",b:
+`<span class="c-punc">{</span>
+  <span class="c-key">"evidence_id"</span><span class="c-punc">:</span>  <span class="c-str">stable, type-prefixed identifier</span><span class="c-punc">,</span>
+  <span class="c-key">"source_type"</span><span class="c-punc">:</span>  <span class="c-str">policy | kyc | trigger | txn_subgraph
+                   | feature | prior_case</span><span class="c-punc">,</span>
+  <span class="c-key">"effective_ts"</span><span class="c-punc">:</span> <span class="c-str">version timestamp</span><span class="c-punc">,</span>
+  <span class="c-key">"acl_tag"</span><span class="c-punc">:</span>      <span class="c-str">access-control label</span><span class="c-punc">,</span>
+  <span class="c-key">"canonical_text"</span><span class="c-punc">:</span><span class="c-str">retrieval + citation form</span><span class="c-punc">,</span>
+  <span class="c-key">"structured"</span><span class="c-punc">:</span>   <span class="c-str">typed fields for verifier checks</span><span class="c-punc">,</span>
+  <span class="c-key">"lineage"</span><span class="c-punc">:</span>      <span class="c-str">event_ids / file+row refs</span>
+<span class="c-punc">}</span>`},
+ g:"Implements the evidence representation and hybrid retrieval of <b>[P3] §2.2 &amp; §3.2</b>, including per-type quotas, deduplication, time-consistent policy versions and hard ACL filtering."},
+
+{t:"D7 · Privacy guard & typology conditioning",
+ body:`<p>Two final preparations before any model call.</p>
+ <p><b>Privacy guard, per [P2] §5.3.</b> Sensitive entities (names, identifiers, contact data — the classes [P2] designates as confidential) are detected and replaced with reversible placeholder tokens before the bundle reaches any LLM. The token map lives inside the trust boundary: analysis runs on masked text, the narrative is <b>unmasked only for the investigator's view</b>, and re-masked before anything is transmitted to external feedback or review systems. Because D5 serialized entities as resolved IDs rather than free text, masking is a clean substitution rather than error-prone NER over prose.</p>
+ <p><b>Typology conditioning.</b> Two mechanisms steer the investigation. First, the <b>crime-type detector</b> of [P2] §5.4: risk-indicator extraction plus tree-based ensemble models over the D4 features produce a ranked list of candidate typologies with confidence scores — this tells the planning agent which specialist agents to spawn. Second, the <b>few-shot exemplar library</b> of [P1] §2.3: for the LLM reasoning step, the prompt includes serialized demonstrations of the eight canonical laundering topologies (shown below) <i>and</i> benign counter-examples, each paired with an analyst-style rationale grounded in graph structure — teaching the model what suspicious and legitimate activity look like in exactly the D5 format it will read.</p>`,
+ in:["Bundle B(a) (D6)","Exemplar library: 8 canonical patterns + benign cases, in D5 format","D4 features → crime-type detector"],
+ out:["Masked bundle + reversible token map (in trust boundary)","Ranked typologies with confidence → planning agent","Assembled prompt: exemplars + masked bundle + output contract"],
+ code:{f:"prompt assembly — order",b:
+`<span class="c-num">1</span> <span class="c-key">role & task header</span>        <span class="c-com">// investigator framing, [P1] §2.3</span>
+<span class="c-num">2</span> <span class="c-key">few-shot exemplars</span>        <span class="c-com">// 8 typologies + benign, D5 format</span>
+<span class="c-num">3</span> <span class="c-key">evidence bundle B(a)</span>      <span class="c-com">// labeled blocks w/ evidence_ids, masked</span>
+<span class="c-num">4</span> <span class="c-key">output contract</span>           <span class="c-com">// schema from [P3] §2.3 — cite IDs only</span>`},
+ g:"Masking cycle from <b>[P2] §5.3</b>; typology detection from <b>[P2] §5.4</b>; few-shot structural conditioning from <b>[P1] §2.3</b>; labeled evidence blocks with ID-only citation from <b>[P3] §3.3</b>."}
+];
+
+function esc(x){return x}
+function renderStage(i){
+  const s=S[i];
+  document.getElementById('stageDetail').innerHTML=`
+    <h2 class="sec" style="margin-top:0"><span class="n">${s.t.split(' · ')[0]}</span> ${s.t.split(' · ')[1]}</h2>
+    <div class="detail-body">${s.body}</div>
+    <div class="io">
+      <div class="box"><span class="kicker">Inputs</span><ul>${s.in.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      <div class="box"><span class="kicker">Outputs</span><ul>${s.out.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    </div>
+    <div class="code"><div class="code-bar">${s.code.f}</div><pre>${s.code.b}</pre></div>
+    <div class="ground"><b>Paper grounding — </b>${s.g}</div>`;
+}
+document.querySelectorAll('.step').forEach(btn=>btn.addEventListener('click',()=>{
+  const i=+btn.dataset.step;
+  document.querySelectorAll('.step').forEach((b,k)=>{b.classList.toggle('active',k===i);b.classList.toggle('done',k<i);});
+  renderStage(i);
+}));
+renderStage(0);
+
+/* ---------- typology grid ---------- */
+function nodes(list){return list.map(([x,y,hot])=>`<circle class="tnode${hot?' hot':''}" cx="${x}" cy="${y}" r="6"/>`).join('');}
+function edges(list){return list.map(([x1,y1,x2,y2])=>`<path class="tedge" d="M${x1},${y1} L${x2},${y2}"/>`).join('');}
+const TY=[
+ {n:"Fan-out",d:"one source disperses to many",svg:edges([[30,37,80,12],[30,37,80,28],[30,37,80,46],[30,37,80,62]])+nodes([[30,37,1],[86,12],[86,28],[86,46],[86,62]])},
+ {n:"Fan-in",d:"many sources converge to one",svg:edges([[34,12,84,37],[34,28,84,37],[34,46,84,37],[34,62,84,37]])+nodes([[28,12],[28,28],[28,46],[28,62],[90,37,1]])},
+ {n:"Gather-scatter",d:"converge briefly, then disperse",svg:edges([[22,15,58,37],[22,37,58,37],[22,59,58,37],[64,37,100,15],[64,37,100,37],[64,37,100,59]])+nodes([[16,15],[16,37],[16,59],[61,37,1],[106,15],[106,37],[106,59]])},
+ {n:"Scatter-gather",d:"disperse, then re-converge",svg:edges([[22,37,58,15],[22,37,58,37],[22,37,58,59],[64,15,100,37],[64,37,100,37],[64,59,100,37]])+nodes([[16,37,1],[61,15],[61,37],[61,59],[106,37,1]])},
+ {n:"Simple cycle",d:"funds return to origin",svg:edges([[38,16,80,16],[86,22,86,50],[80,58,38,58],[32,50,32,22]])+nodes([[34,16,1],[86,16],[86,56],[34,56]])},
+ {n:"Bipartite",d:"dense many-to-many, mule-like",svg:edges([[30,14,84,20],[30,14,84,44],[30,37,84,20],[30,37,84,62],[30,60,84,44],[30,60,84,62]])+nodes([[24,14],[24,37],[24,60],[90,20],[90,44],[90,62]])},
+ {n:"Stack",d:"layered chain of intermediaries",svg:edges([[24,37,48,37],[56,37,80,37],[88,37,108,37]])+nodes([[18,37,1],[52,37],[84,37],[112,37]])},
+ {n:"Random",d:"irregular, low-structure flow",svg:edges([[24,20,58,44],[58,44,92,18],[58,44,44,62],[92,18,100,52]])+nodes([[24,20],[58,44],[92,18],[44,62],[100,52]])}
+];
+document.getElementById('typoGrid').innerHTML=TY.map(t=>`
+  <div class="typo"><svg viewBox="0 0 128 74" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${t.n}">${t.svg}</svg>
+  <div class="tn">${t.n}</div><div class="td">${t.d}</div></div>`).join('');
+</script>
+</body>
+</html>
